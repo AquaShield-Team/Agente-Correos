@@ -1,0 +1,43 @@
+# ============================================================
+# AquaShield · Agente de Correos · .gitignore
+# ============================================================
+
+# Archivos temporales de uploads
+uploads/
+!uploads/.gitkeep
+
+# Base de datos de clientes (cada equipo tiene la suya)
+Base_Clientes.xlsx
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Entorno virtual
+venv/
+.venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Excel temporales
+~$*.xlsx
+~$*.xls
+
+# Scripts temporales
+patch.py
+write_app.py
+app_new.py
+
+# Logs
+*.log

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente de Correos | ExportDesk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar lateral -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-text">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>AQUASHIELD</span>
+                </div>
+                <button id="sidebarToggle" class="btn-toggle"><i class="fa-solid fa-bars"></i></button>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-target="view-correos" title="Correos"><i class="fa-solid fa-envelope"></i> <span class="nav-text">Correos</span></a>
+                <a href="#" class="nav-item" data-target="view-base-clientes" title="Base Clientes"><i class="fa-solid fa-users"></i> <span class="nav-text">Base Clientes</span></a>
+                <a href="#" class="nav-item" data-target="view-ajustes" title="Ajustes"><i class="fa-solid fa-gear"></i> <span class="nav-text">Ajustes</span></a>
+            </nav>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <div id="view-correos" class="view-section">
+                <header class="top-header">
+                    <div class="header-title">
+                        <h1>Repositorio de Clientes</h1>
+                        <p>Filtra un cliente y arrastra un documento para generar el correo instantáneamente.</p>
+                    </div>
+                </header>
+
+                <section class="toolbar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar cliente por nombre o correo...">
+                    </div>
+                    <button id="btnRefrescar" class="btn-refresh" title="Actualizar lista desde Excel">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                </section>
+
+                <section class="table-container">
+                    <table id="clientesTable">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Asunto</th>
+                                <th class="actions-col">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientesBody">
+                            <!-- Llenado dinámico mediante JS -->
+                        </tbody>
+                    </table>
+                    <div id="emptyState" class="empty-state hidden">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <p>No se encontraron clientes.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Vista: Base de Clientes -->
+            <div id="view-base-clientes" class="view-section hidden">
+                <header class="top-header">
+                    <div class="header-title">
+                        <h1>Base de Clientes</h1>
+                        <p>La base de datos central ahora es una planilla Excel.</p>
+                    </div>
+                    <button class="btn-generar" id="btnAbrirExcel" style="background-color: var(--success); margin-top: 12px; margin-bottom: 12px;">
+                        <i class="fa-solid fa-file-excel"></i> Abrir Excel de Base de Datos
+                    </button>
+                </header>
+                
+                <div class="form-container" style="background: var(--bg-panel); padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-top: 24px;">
+                    <h3 style="margin-bottom: 16px;">Añadir Nuevo Cliente</h3>
+                    <form id="formNuevoCliente" style="display: flex; flex-direction: column; gap: 16px;">
+                        <input type="text" id="new_cliente" placeholder="Nombre del Cliente" required class="custom-input">
+                        <input type="email" id="new_para" placeholder="Correo Principal (Para)" required class="custom-input">
+                        <input type="text" id="new_cc" placeholder="Con Copia (CC) - Opcional" class="custom-input">
+                        <input type="text" id="new_asunto" placeholder="Asunto (usa [PEDIDO] y [CLIENTE] como variables)" required class="custom-input">
+                        <textarea id="new_cuerpo" placeholder="Cuerpo del correo (usa <br> para saltos de línea y [PEDIDO])" required class="custom-input" rows="4"></textarea>
+                        <button type="submit" class="btn-generar" style="width: fit-content;"><i class="fa-solid fa-plus"></i> Guardar Cliente</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Vista: Ajustes -->
+            <div id="view-ajustes" class="view-section hidden">
+                <header class="top-header">
+                    <div class="header-title">
+                        <h1>Ajustes Generales</h1>
+                        <p>Configura la apariencia y el comportamiento del agente.</p>
+                    </div>
+                </header>
+                
+                <div class="form-container" style="background: var(--bg-panel); padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-top: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+                        <div>
+                            <h3 style="margin-bottom: 4px;">Modo Claro (Light Mode)</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Cambia el tema visual de oscuro a claro.</p>
+                        </div>
+                        <label class="theme-switch">
+                            <input type="checkbox" id="lightModeToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script de lógica -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
