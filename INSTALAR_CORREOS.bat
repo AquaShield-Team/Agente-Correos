@@ -6,32 +6,42 @@ color 0B
 echo.
 echo  ╔══════════════════════════════════════════════════════════╗
 echo  ║   AquaShield · Instalador Agente de Correos             ║
-echo  ║   Configuracion automatica del entorno                  ║
+echo  ║   Este script instala TODO lo necesario                  ║
 echo  ╚══════════════════════════════════════════════════════════╝
 echo.
 
 cd /d "%~dp0"
 
-:: ── 1. Verificar Python ──────────────────────────────────────
-echo [1/3] Verificando Python...
+:: ── 1. Verificar/Instalar Python ─────────────────────────────
+echo [1/4] Verificando Python...
 python --version >nul 2>&1
-if errorlevel 1 (
-    echo.
-    echo  ❌ Python no esta instalado o no esta en el PATH.
-    echo     Descarga Python 3.11+ desde: https://www.python.org/downloads/
-    echo     IMPORTANTE: Marca la casilla "Add Python to PATH" al instalar.
-    echo.
+if %errorlevel%==0 (
+    for /f "tokens=2" %%v in ('python --version 2^>^&1') do echo     ✅ Python %%v detectado.
+) else (
+    echo     ❌ Python no encontrado. Instalando con winget...
+    winget install Python.Python.3.13 --accept-package-agreements --accept-source-agreements -e
+    if errorlevel 1 (
+        echo.
+        echo  ⚠️  No se pudo instalar Python automaticamente.
+        echo     Descarga manualmente: https://www.python.org/downloads/
+        echo     IMPORTANTE: Marca "Add Python to PATH" al instalar.
+        echo.
+        pause
+        exit /b 1
+    )
+    echo     ✅ Python instalado. Reinicia este script para continuar.
+    echo     ⚠️  CIERRA esta ventana, abre CMD de nuevo y ejecuta este script otra vez.
     pause
-    exit /b 1
+    exit /b 0
 )
-for /f "tokens=2" %%v in ('python --version 2^>^&1') do set PYVER=%%v
-echo     ✅ Python %PYVER% detectado.
 
-:: ── 2. Verificar Git ─────────────────────────────────────────
+:: ── 2. Verificar/Instalar Git ────────────────────────────────
 echo.
-echo [2/3] Verificando Git...
+echo [2/4] Verificando Git...
 git --version >nul 2>&1
-if errorlevel 1 (
+if %errorlevel%==0 (
+    for /f "tokens=3" %%v in ('git --version 2^>^&1') do echo     ✅ Git %%v detectado.
+) else (
     echo     ❌ Git no encontrado. Instalando con winget...
     winget install Git.Git --accept-package-agreements --accept-source-agreements -e
     if errorlevel 1 (
@@ -43,14 +53,35 @@ if errorlevel 1 (
         exit /b 1
     )
     echo     ✅ Git instalado. Reinicia este script para continuar.
+    echo     ⚠️  CIERRA esta ventana, abre CMD de nuevo y ejecuta este script otra vez.
     pause
     exit /b 0
 )
-for /f "tokens=3" %%v in ('git --version 2^>^&1') do echo     ✅ Git %%v detectado.
 
-:: ── 3. Instalar dependencias Python ──────────────────────────
+:: ── 3. Clonar repositorio (si no existe) ─────────────────────
 echo.
-echo [3/3] Instalando dependencias de Python...
+echo [3/4] Verificando repositorio...
+if exist "app.py" (
+    echo     ✅ Repositorio ya descargado.
+) else if exist "Agente-Correos\app.py" (
+    echo     ✅ Repositorio ya clonado en subcarpeta.
+    cd Agente-Correos
+) else (
+    echo     Descargando el Agente de Correos desde GitHub...
+    git clone https://github.com/AquaShield-Team/Agente-Correos.git
+    if errorlevel 1 (
+        echo.
+        echo  ⚠️  No se pudo descargar. Revisa tu acceso a GitHub.
+        pause
+        exit /b 1
+    )
+    cd Agente-Correos
+    echo     ✅ Repositorio descargado.
+)
+
+:: ── 4. Instalar dependencias Python ──────────────────────────
+echo.
+echo [4/4] Instalando dependencias de Python...
 python -m pip install --upgrade pip >nul 2>&1
 python -m pip install -r requirements.txt -q
 if errorlevel 1 (
@@ -83,6 +114,9 @@ echo  ║   1. Ejecuta Iniciar_Agente_Correos.bat                  ║
 echo  ║   2. Se abre el dashboard en tu navegador                ║
 echo  ║   3. Edita Base_Clientes.xlsx para agregar clientes      ║
 echo  ║   4. Selecciona un cliente y genera el correo!           ║
+echo  ║                                                          ║
+echo  ║   Las actualizaciones se descargan automaticamente       ║
+echo  ║   cada vez que inicies el agente.                        ║
 echo  ║                                                          ║
 echo  ╚══════════════════════════════════════════════════════════╝
 echo.
