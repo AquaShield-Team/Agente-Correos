@@ -56,6 +56,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('light-mode');
     }
 
+    // Outlook Mode Toggle (clasico vs nuevo)
+    const outlookModeToggle = document.getElementById('outlookModeToggle');
+    
+    outlookModeToggle.addEventListener('change', (e) => {
+        localStorage.setItem('outlookNuevo', e.target.checked ? 'true' : 'false');
+    });
+
+    // Restaurar preferencia de Outlook
+    if (localStorage.getItem('outlookNuevo') === 'true') {
+        outlookModeToggle.checked = true;
+    }
+
     // 1. Cargar datos del servidor
     async function loadClientes() {
         try {
@@ -171,6 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData();
         formData.append("cliente_id", clienteId);
+        // Enviar modo de Outlook al backend
+        const modoOutlook = localStorage.getItem('outlookNuevo') === 'true' ? 'nuevo' : 'clasico';
+        formData.append("modo", modoOutlook);
         if (file) {
             formData.append("archivo", file);
         }
