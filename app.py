@@ -44,7 +44,12 @@ def cargar_clientes():
     def safe_cell(row, idx):
         if idx >= len(row) or row[idx] is None:
             return ""
-        return str(row[idx])
+        val = row[idx]
+        # Normalizar IDs numericos: 1.0 -> "1"
+        if isinstance(val, (int, float)):
+            if val == int(val):
+                return str(int(val))
+        return str(val)
 
     for row in ws.iter_rows(min_row=2, values_only=True):
         if not row or len(row) < 2 or not row[1]:
