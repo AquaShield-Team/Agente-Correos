@@ -123,11 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="asunto-preview" title="${asuntoPreview}">${asuntoPreview}</div>
                 </td>
                 <td class="actions-col">
-                    <button class="btn-generar" onclick="generarCorreo(${cliente.id})" style="margin-right: 4px;" title="Generar Correo">
+                    <button class="btn-generar" onclick="generarCorreo(${cliente.id})" title="Generar Correo">
                         <i class="fa-solid fa-paper-plane"></i>
-                    </button>
-                    <button class="btn-generar" onclick="eliminarCliente(${cliente.id})" style="background-color: #ef4444; padding: 8px 12px;" title="Eliminar Cliente">
-                        <i class="fa-solid fa-trash"></i>
                     </button>
                 </td>
             `;
@@ -216,21 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 6. Eliminar cliente
-    window.eliminarCliente = async function(clienteId) {
-        if (!confirm("¿Estás seguro de eliminar este cliente? (Se borrará del Excel)")) return;
-        
-        try {
-            const res = await fetch(`/api/clientes/${clienteId}`, { method: 'DELETE' });
-            const result = await res.json();
-            if (result.success) {
-                loadClientes(); // Recargar tabla
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Error al eliminar cliente.");
-        }
-    };
+
 
     // Botón Abrir Excel
     const btnAbrirExcel = document.getElementById('btnAbrirExcel');
