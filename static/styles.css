@@ -12,7 +12,6 @@
     --text-main: #f8fafc;
     --text-muted: #8fa0b0;
     --accent: #EB5F0A;       /* Pantone 021 C — Naranja corporativo */
-    --accent-hover: #C76728; /* Pantone 158 C */
     --success: #10b981;
     --border: #4a5a68;
     --drop-active: rgba(235, 95, 10, 0.15);
@@ -365,24 +364,6 @@ td {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-/* ── Forms ────────────────────────────────────────────────── */
-.custom-input {
-    background-color: var(--bg-dark);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: var(--text-main);
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.2s;
-    width: 100%;
-    font-family: 'Inter', sans-serif;
-}
-
-.custom-input:focus {
-    border-color: var(--accent);
 }
 
 /* ── Form container titles ───────────────────────────────── */

@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error(error);
             } finally {
                 setTimeout(() => {
-                    btnAbrirExcel.innerHTML = `<i class="fa-solid fa-file-excel"></i> Abrir Excel de Base de Datos`;
+                    btnAbrirExcel.innerHTML = `<i class="fa-solid fa-file-excel"></i> Abrir Excel`;
                 }, 1000);
             }
         });
