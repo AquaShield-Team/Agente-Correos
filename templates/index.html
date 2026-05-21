@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agente de Correos | AquaShield</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#445563">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css">
     <!-- FontAwesome para iconos -->
@@ -133,6 +137,9 @@
                         <option value="semana">Esta semana</option>
                         <option value="mes">Este mes</option>
                     </select>
+                    <button id="btnExportarHistorial" class="btn-generar" style="gap: 6px; padding: 0 16px; height: 48px; font-size: 0.85rem;">
+                        <i class="fa-solid fa-file-export"></i> Exportar Excel
+                    </button>
                 </section>
 
                 <section class="table-container">
@@ -203,5 +210,11 @@
 
     <!-- Script de lógica -->
     <script src="/static/app.js"></script>
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+        }
+    </script>
 </body>
 </html>

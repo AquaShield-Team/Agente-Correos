@@ -93,7 +93,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // ═══════════════════════════════════════════════════════
     // 1. CARGAR CLIENTES
     // ═══════════════════════════════════════════════════════
+    // 💀 SKELETON LOADER
+    // ═══════════════════════════════════════════════════════
+    function showSkeletons() {
+        clientesBody.innerHTML = '';
+        clientesTable.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+        for (let i = 0; i < 5; i++) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="width:40px"><div class="skeleton" style="width:20px;height:20px;border-radius:4px;"></div></td>
+                <td><div class="skeleton" style="width:${60 + Math.random()*30}%;height:16px;border-radius:4px;"></div></td>
+                <td><div class="skeleton" style="width:${40 + Math.random()*40}%;height:16px;border-radius:4px;"></div></td>
+                <td class="actions-col"><div class="skeleton" style="width:36px;height:36px;border-radius:6px;"></div></td>
+            `;
+            clientesBody.appendChild(tr);
+        }
+    }
+
+    // 1. CARGAR CLIENTES
+    // ═══════════════════════════════════════════════════════
     async function loadClientes() {
+        showSkeletons();
         try {
             const response = await fetch('/api/clientes');
             clientesData = await response.json();
@@ -155,8 +176,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
                     </button>
                 </td>
-                <td>
+                <td class="td-cliente-name">
                     <div class="cliente-name">${cliente.cliente}</div>
+                    <div class="cliente-tooltip">
+                        <div class="tooltip-row"><strong>Para:</strong> ${cliente.para || '—'}</div>
+                        <div class="tooltip-row"><strong>CC:</strong> ${cliente.cc || '—'}</div>
+                        <div class="tooltip-row"><strong>Cuerpo:</strong> ${(cliente.cuerpo || '').replace(/<br\s*\/?>/gi, ' ').substring(0, 100)}${(cliente.cuerpo || '').length > 100 ? '...' : ''}</div>
+                    </div>
                 </td>
                 <td>
                     <div class="asunto-preview" title="${asuntoPreview}">${asuntoPreview}</div>
@@ -208,14 +234,15 @@ document.addEventListener('DOMContentLoaded', () => {
             row.classList.remove('drag-over');
 
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                const file = e.dataTransfer.files[0];
-                generarCorreo(clienteId, file, row);
+                // Multi-archivo: pasar TODOS los archivos
+                const files = Array.from(e.dataTransfer.files);
+                generarCorreo(clienteId, files, row);
             }
         });
     }
 
-    // 5. Generar Correo
-    window.generarCorreo = async function(clienteId, file = null, row = null) {
+    // 5. Generar Correo (soporta multi-archivo)
+    window.generarCorreo = async function(clienteId, files = null, row = null) {
         const btn = row ? null : document.querySelector(`tr[data-id="${clienteId}"] .btn-generar`);
         
         if (btn) {
@@ -227,8 +254,11 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append("cliente_id", clienteId);
         const modoOutlook = localStorage.getItem('outlookNuevo') === 'true' ? 'nuevo' : 'clasico';
         formData.append("modo", modoOutlook);
-        if (file) {
-            formData.append("archivo", file);
+        
+        // Soportar un solo archivo o array de archivos
+        if (files) {
+            const fileList = Array.isArray(files) ? files : [files];
+            fileList.forEach(f => formData.append("archivo", f));
         }
 
         try {
@@ -249,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i>`;
                 btn.disabled = false;
             }
-            if (file) {
+            if (files && row) {
                 row.style.backgroundColor = "var(--success)";
                 setTimeout(() => row.style.backgroundColor = "", 1000);
             }
@@ -450,6 +480,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     btnAbrirExcel.innerHTML = `<i class="fa-solid fa-file-excel"></i> Abrir Excel`;
                 }, 1000);
             }
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 📤 EXPORTAR HISTORIAL
+    // ═══════════════════════════════════════════════════════
+    const btnExportar = document.getElementById('btnExportarHistorial');
+    if (btnExportar) {
+        btnExportar.addEventListener('click', () => {
+            btnExportar.innerHTML = `<i class="fa-solid fa-spinner"></i> Exportando...`;
+            btnExportar.disabled = true;
+            // Descargar archivo
+            const link = document.createElement('a');
+            link.href = '/api/exportar_historial';
+            link.download = 'Historial_Correos.xlsx';
+            link.click();
+            setTimeout(() => {
+                btnExportar.innerHTML = `<i class="fa-solid fa-file-export"></i> Exportar Excel`;
+                btnExportar.disabled = false;
+            }, 1500);
         });
     }
 

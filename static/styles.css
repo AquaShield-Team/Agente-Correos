@@ -655,6 +655,71 @@ input:checked + .slider:before {
     color: var(--accent);
 }
 
+/* ── Skeleton Loader ─────────────────────────────────────── */
+.skeleton {
+    background: linear-gradient(90deg, var(--border) 25%, rgba(255,255,255,0.08) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+body.light-mode .skeleton {
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+/* ── Tooltip de Cliente ──────────────────────────────────── */
+.td-cliente-name {
+    position: relative;
+}
+
+.cliente-tooltip {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    min-width: 320px;
+    max-width: 420px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    animation: tooltip-fade 0.15s ease-out;
+}
+
+.td-cliente-name:hover .cliente-tooltip {
+    display: block;
+}
+
+.tooltip-row {
+    margin-bottom: 6px;
+    color: var(--text-muted);
+    word-break: break-all;
+}
+
+.tooltip-row strong {
+    color: var(--text-main);
+    margin-right: 4px;
+}
+
+.tooltip-row:last-child {
+    margin-bottom: 0;
+}
+
+@keyframes tooltip-fade {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 900px) {
     .stat-cards {

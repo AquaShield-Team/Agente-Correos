@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 import pythoncom
 import openpyxl
 import win32com.client
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 
 # Configuracion de rutas (compatible con PyInstaller)
 if getattr(sys, 'frozen', False):
@@ -161,33 +161,37 @@ def generar_correo():
             mailto_url = f"mailto:{para}?{urllib.parse.urlencode(params, quote_via=urllib.parse.quote)}"
             webbrowser.open(mailto_url)
 
-            # Nota sobre adjunto
-            archivo_adjunto = request.files.get("archivo")
+            # Nota sobre adjuntos
+            archivos = request.files.getlist("archivo")
+            nombres_archivos = [f.filename for f in archivos if f and f.filename]
             msg = "Correo abierto en Outlook Nuevo."
-            if archivo_adjunto and archivo_adjunto.filename:
-                msg += " NOTA: Debes adjuntar el archivo manualmente en la ventana de Outlook."
+            if nombres_archivos:
+                msg += f" NOTA: Debes adjuntar {len(nombres_archivos)} archivo(s) manualmente."
 
             # Registrar en historial
-            archivo_nombre = archivo_adjunto.filename if (archivo_adjunto and archivo_adjunto.filename) else ""
             guardar_historial({
                 "timestamp": datetime.now().isoformat(),
                 "cliente_id": cliente_id,
                 "cliente": cliente["cliente"],
                 "para": cliente.get("para", ""),
                 "asunto": asunto,
-                "archivo": archivo_nombre,
+                "archivo": ", ".join(nombres_archivos) if nombres_archivos else "",
                 "modo": "nuevo"
             })
 
             return jsonify({"success": True, "message": msg, "modo": "nuevo"})
 
         # ── Modo: Outlook Clasico (COM) ───────────────────────
-        archivo_adjunto = request.files.get("archivo")
-        ruta_archivo = None
-        if archivo_adjunto and archivo_adjunto.filename:
-            nombre_seguro = f"{uuid.uuid4().hex}_{archivo_adjunto.filename}"
-            ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], nombre_seguro)
-            archivo_adjunto.save(ruta_archivo)
+        archivos = request.files.getlist("archivo")
+        rutas_archivos = []
+        nombres_archivos = []
+        for archivo in archivos:
+            if archivo and archivo.filename:
+                nombre_seguro = f"{uuid.uuid4().hex}_{archivo.filename}"
+                ruta = os.path.join(app.config['UPLOAD_FOLDER'], nombre_seguro)
+                archivo.save(ruta)
+                rutas_archivos.append(ruta)
+                nombres_archivos.append(archivo.filename)
 
         pythoncom.CoInitialize()
         outlook = win32com.client.Dispatch("Outlook.Application")
@@ -205,7 +209,7 @@ def generar_correo():
         mail.CC = formatear_correos(cliente.get("cc", ""))
         mail.Subject = asunto
 
-        # Capturar HTML de Outlook (firma dentro de <html><body><div class=WordSection1>...)
+        # Capturar HTML de Outlook (firma)
         firma_html = mail.HTMLBody
         cuerpo_html = "<p class=MsoNormal style='margin:0;padding:0'><span style='font-family:Calibri,sans-serif;font-size:11.0pt'>" + cuerpo + "</span></p><br>"
 
@@ -226,29 +230,26 @@ def generar_correo():
             else:
                 mail.HTMLBody = cuerpo_html + firma_html
 
-        if ruta_archivo:
-            mail.Attachments.Add(ruta_archivo)
+        # Adjuntar todos los archivos
+        for ruta in rutas_archivos:
+            mail.Attachments.Add(ruta)
             try:
-                os.remove(ruta_archivo)
+                os.remove(ruta)
             except Exception as e:
                 print(f"No se pudo eliminar el archivo temporal: {e}")
 
         # Registrar en historial
-        archivo_nombre = os.path.basename(ruta_archivo) if ruta_archivo else ""
-        # Limpiar el prefijo UUID del nombre
-        if archivo_nombre and "_" in archivo_nombre:
-            archivo_nombre = "_".join(archivo_nombre.split("_")[1:])
         guardar_historial({
             "timestamp": datetime.now().isoformat(),
             "cliente_id": cliente_id,
             "cliente": cliente["cliente"],
             "para": cliente.get("para", ""),
             "asunto": asunto,
-            "archivo": archivo_nombre,
+            "archivo": ", ".join(nombres_archivos) if nombres_archivos else "",
             "modo": "clasico"
         })
 
-        return jsonify({"success": True, "message": "Correo abierto en Outlook Clasico", "modo": "clasico"})
+        return jsonify({"success": True, "message": f"Correo abierto con {len(rutas_archivos)} adjunto(s)", "modo": "clasico"})
 
     except Exception as e:
         import traceback
@@ -309,6 +310,38 @@ def excel_timestamp():
         return jsonify({"timestamp": 0})
     except Exception:
         return jsonify({"timestamp": 0})
+
+
+@app.route("/api/exportar_historial", methods=["GET"])
+def exportar_historial():
+    historial = cargar_historial()
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Historial de Correos"
+    ws.append(["Fecha", "Cliente", "Destinatario", "Asunto", "Adjunto", "Modo"])
+
+    for entry in historial:
+        try:
+            fecha = datetime.fromisoformat(entry["timestamp"]).strftime("%d/%m/%Y %H:%M")
+        except (ValueError, KeyError):
+            fecha = ""
+        ws.append([
+            fecha,
+            entry.get("cliente", ""),
+            entry.get("para", ""),
+            entry.get("asunto", ""),
+            entry.get("archivo", ""),
+            entry.get("modo", "")
+        ])
+
+    # Ajustar ancho de columnas
+    for col in ws.columns:
+        max_len = max(len(str(cell.value or "")) for cell in col)
+        ws.column_dimensions[col[0].column_letter].width = min(max_len + 2, 50)
+
+    export_path = os.path.join(UPLOAD_FOLDER, "historial_correos.xlsx")
+    wb.save(export_path)
+    return send_file(export_path, as_attachment=True, download_name="Historial_Correos.xlsx")
 
 
 if __name__ == "__main__":
