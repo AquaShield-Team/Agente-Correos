@@ -185,10 +185,12 @@ def generar_correo():
         archivos = request.files.getlist("archivo")
         rutas_archivos = []
         nombres_archivos = []
+        # Subcarpeta única para evitar colisiones sin renombrar archivos
+        subfolder = os.path.join(app.config['UPLOAD_FOLDER'], uuid.uuid4().hex)
+        os.makedirs(subfolder, exist_ok=True)
         for archivo in archivos:
             if archivo and archivo.filename:
-                nombre_seguro = f"{uuid.uuid4().hex}_{archivo.filename}"
-                ruta = os.path.join(app.config['UPLOAD_FOLDER'], nombre_seguro)
+                ruta = os.path.join(subfolder, archivo.filename)
                 archivo.save(ruta)
                 rutas_archivos.append(ruta)
                 nombres_archivos.append(archivo.filename)
@@ -237,6 +239,11 @@ def generar_correo():
                 os.remove(ruta)
             except Exception as e:
                 print(f"No se pudo eliminar el archivo temporal: {e}")
+        # Limpiar subcarpeta temporal
+        try:
+            os.rmdir(subfolder)
+        except Exception:
+            pass
 
         # Registrar en historial
         guardar_historial({
