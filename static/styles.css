@@ -1,24 +1,31 @@
+/* ============================================================
+   AquaShield · Agente de Correos
+   Paleta basada en Manual de Marca AquaChile (Pantone 7545 C)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 :root {
-    --bg-dark: #0f172a;
-    --bg-panel: #1e293b;
-    --bg-hover: #334155;
+    --bg-dark: #2d3a45;
+    --bg-panel: #3a4a58;
+    --bg-hover: #445563;
     --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --accent: #0ea5e9; /* Teal/Blue */
-    --accent-hover: #0284c7;
+    --text-muted: #8fa0b0;
+    --accent: #EB5F0A;       /* Pantone 021 C — Naranja corporativo */
+    --accent-hover: #C76728; /* Pantone 158 C */
     --success: #10b981;
-    --border: #334155;
-    --drop-active: rgba(14, 165, 233, 0.2);
+    --border: #4a5a68;
+    --drop-active: rgba(235, 95, 10, 0.15);
 }
 
 body.light-mode {
-    --bg-dark: #f1f5f9;
+    --bg-dark: #EFE9E5;      /* Warm Gray 1 C */
     --bg-panel: #ffffff;
-    --bg-hover: #f8fafc;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
-    --drop-active: rgba(14, 165, 233, 0.1);
+    --bg-hover: #f5f0ec;
+    --text-main: #445563;    /* Pantone 7545 C */
+    --text-muted: #6b7d8d;
+    --border: #d9d0c7;
+    --drop-active: rgba(235, 95, 10, 0.08);
 }
 
 * {
@@ -43,7 +50,7 @@ body {
     height: 100%;
 }
 
-/* Sidebar */
+/* ── Sidebar ─────────────────────────────────────────────── */
 .sidebar {
     width: 260px;
     background-color: var(--bg-panel);
@@ -60,13 +67,19 @@ body {
 }
 
 .sidebar.collapsed .logo-text,
-.sidebar.collapsed .nav-text {
+.sidebar.collapsed .nav-text,
+.sidebar.collapsed .brand-subtitle {
     display: none;
 }
 
 .sidebar.collapsed .logo {
     justify-content: center;
     padding: 0;
+}
+
+.sidebar.collapsed .brand-logo {
+    width: 32px;
+    height: 32px;
 }
 
 .sidebar.collapsed .nav-item {
@@ -90,9 +103,44 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--accent);
+    white-space: nowrap;
+}
+
+.brand-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+body.light-mode .brand-logo {
+    filter: none;
+}
+
+.brand-name {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.brand-name strong {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text-main);
+}
+
+.brand-subtitle {
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: none;
 }
 
 .btn-toggle {
@@ -108,6 +156,7 @@ body {
     color: var(--text-main);
 }
 
+/* ── Navigation ──────────────────────────────────────────── */
 .nav-menu {
     display: flex;
     flex-direction: column;
@@ -133,11 +182,11 @@ body {
 }
 
 .nav-item.active {
-    background-color: rgba(14, 165, 233, 0.1);
+    background-color: rgba(235, 95, 10, 0.12);
     color: var(--accent);
 }
 
-/* Main Content */
+/* ── Main Content ────────────────────────────────────────── */
 .main-content {
     flex: 1;
     display: flex;
@@ -147,6 +196,7 @@ body {
 }
 
 .header-title h1 {
+    font-family: 'Quicksand', sans-serif;
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 8px;
@@ -157,7 +207,7 @@ body {
     font-size: 0.95rem;
 }
 
-
+/* ── Search Box ──────────────────────────────────────────── */
 .search-box {
     display: flex;
     align-items: center;
@@ -188,7 +238,7 @@ body {
     outline: none;
 }
 
-/* Table */
+/* ── Table ───────────────────────────────────────────────── */
 .table-container {
     background-color: var(--bg-panel);
     border-radius: 12px;
@@ -227,11 +277,10 @@ td {
     color: var(--text-main);
 }
 
-
 .asunto-preview {
     font-size: 0.9rem;
     color: var(--text-muted);
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0,0,0,0.15);
     padding: 6px 12px;
     border-radius: 6px;
     display: inline-block;
@@ -239,10 +288,11 @@ td {
 }
 
 .actions-col {
-    width: 150px;
+    width: 120px;
     text-align: right;
 }
 
+/* ── Buttons ─────────────────────────────────────────────── */
 .btn-generar {
     background-color: var(--accent);
     color: white;
@@ -263,7 +313,7 @@ td {
     transform: translateY(-1px);
 }
 
-/* Drag & Drop state para cada fila */
+/* ── Drag & Drop ─────────────────────────────────────────── */
 .client-row {
     transition: all 0.2s;
     position: relative;
@@ -283,7 +333,7 @@ td {
     opacity: 0.7;
 }
 
-/* Empty State */
+/* ── Empty State ─────────────────────────────────────────── */
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -303,7 +353,7 @@ td {
     display: none !important;
 }
 
-/* Spinner */
+/* ── Spinner ─────────────────────────────────────────────── */
 .fa-spinner {
     animation: spin 1s linear infinite;
 }
@@ -313,8 +363,7 @@ td {
     100% { transform: rotate(360deg); }
 }
 
-
-/* Formularios */
+/* ── Forms ────────────────────────────────────────────────── */
 .custom-input {
     background-color: var(--bg-dark);
     border: 1px solid var(--border);
@@ -332,7 +381,13 @@ td {
     border-color: var(--accent);
 }
 
-/* Theme Switch Toggle */
+/* ── Form container titles ───────────────────────────────── */
+.form-container h3 {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+}
+
+/* ── Theme Switch Toggle ─────────────────────────────────── */
 .theme-switch {
   position: relative;
   display: inline-block;
@@ -381,7 +436,7 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-/* Toolbar */
+/* ── Toolbar ─────────────────────────────────────────────── */
 .toolbar {
     display: flex;
     align-items: center;
@@ -390,7 +445,7 @@ input:checked + .slider:before {
     margin-bottom: 24px;
 }
 
-/* Boton Refrescar */
+/* ── Refresh Button ──────────────────────────────────────── */
 .btn-refresh {
     background: var(--bg-panel);
     border: 1px solid var(--border);
