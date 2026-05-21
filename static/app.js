@@ -231,47 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 7. Añadir cliente (Formulario)
-    const formNuevoCliente = document.getElementById('formNuevoCliente');
-    if (formNuevoCliente) {
-        formNuevoCliente.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const payload = {
-                cliente: document.getElementById('new_cliente').value,
-                para: document.getElementById('new_para').value,
-                cc: document.getElementById('new_cc').value,
-                asunto: document.getElementById('new_asunto').value,
-                cuerpo: document.getElementById('new_cuerpo').value,
-            };
-
-            const btn = formNuevoCliente.querySelector('button');
-            btn.innerHTML = `<i class="fa-solid fa-spinner"></i> Guardando...`;
-            btn.disabled = true;
-
-            try {
-                const res = await fetch('/api/clientes', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await res.json();
-                if (result.success) {
-                    formNuevoCliente.reset();
-                    loadClientes();
-                    // Volver a la vista de correos
-                    document.querySelector('[data-target="view-correos"]').click();
-                }
-            } catch (error) {
-                console.error(error);
-                alert("Error al guardar el cliente.");
-            } finally {
-                btn.innerHTML = `<i class="fa-solid fa-plus"></i> Guardar Cliente`;
-                btn.disabled = false;
-            }
-        });
-    }
-
     // Iniciar
     loadClientes();
 });

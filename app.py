@@ -66,19 +66,6 @@ def cargar_clientes():
     return clientes
 
 
-def guardar_clientes(clientes):
-    if not os.path.exists(ARCHIVO_DB):
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.append(["ID", "Cliente", "Para", "CC", "Asunto", "Cuerpo"])
-    else:
-        wb = openpyxl.load_workbook(ARCHIVO_DB)
-        ws = wb.active
-        ws.delete_rows(2, ws.max_row)
-
-    for c in clientes:
-        ws.append([c.get("id"), c.get("cliente"), c.get("para"), c.get("cc"), c.get("asunto"), c.get("cuerpo")])
-    wb.save(ARCHIVO_DB)
 
 
 def limpiar_parrafos_vacios(html):
@@ -106,36 +93,9 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/api/clientes", methods=["GET", "POST"])
+@app.route("/api/clientes", methods=["GET"])
 def api_clientes():
-    if request.method == "GET":
-        return jsonify(cargar_clientes())
-
-    if request.method == "POST":
-        data = request.json
-        clientes = cargar_clientes()
-
-        ids_numericos = []
-        for c in clientes:
-            try:
-                ids_numericos.append(int(float(c["id"])))
-            except (ValueError, TypeError):
-                pass
-        nuevo_id = str(max(ids_numericos + [0]) + 1)
-
-        nuevo_cliente = {
-            "id": nuevo_id,
-            "cliente": data.get("cliente"),
-            "para": data.get("para"),
-            "cc": data.get("cc", ""),
-            "asunto": data.get("asunto", "[CLIENTE]"),
-            "cuerpo": data.get("cuerpo", "")
-        }
-
-        clientes.append(nuevo_cliente)
-        guardar_clientes(clientes)
-        return jsonify({"success": True, "cliente": nuevo_cliente})
-
+    return jsonify(cargar_clientes())
 
 
 @app.route("/api/abrir_excel", methods=["GET"])

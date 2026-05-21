@@ -25,7 +25,6 @@
             </div>
             <nav class="nav-menu">
                 <a href="#" class="nav-item active" data-target="view-correos" title="Correos"><i class="fa-solid fa-envelope"></i> <span class="nav-text">Correos</span></a>
-                <a href="#" class="nav-item" data-target="view-base-clientes" title="Base Clientes"><i class="fa-solid fa-users"></i> <span class="nav-text">Base Clientes</span></a>
                 <a href="#" class="nav-item" data-target="view-ajustes" title="Ajustes"><i class="fa-solid fa-gear"></i> <span class="nav-text">Ajustes</span></a>
             </nav>
         </aside>
@@ -70,31 +69,6 @@
                 </section>
             </div>
 
-            <!-- Vista: Base de Clientes -->
-            <div id="view-base-clientes" class="view-section hidden">
-                <header class="top-header">
-                    <div class="header-title">
-                        <h1>Base de Clientes</h1>
-                        <p>La base de datos central ahora es una planilla Excel.</p>
-                    </div>
-                    <button class="btn-generar" id="btnAbrirExcel" style="background-color: #445563; margin-top: 12px; margin-bottom: 12px;">
-                        <i class="fa-solid fa-file-excel"></i> Abrir Excel de Base de Datos
-                    </button>
-                </header>
-                
-                <div class="form-container" style="background: var(--bg-panel); padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-top: 24px;">
-                    <h3 style="margin-bottom: 16px;">Añadir Nuevo Cliente</h3>
-                    <form id="formNuevoCliente" style="display: flex; flex-direction: column; gap: 16px;">
-                        <input type="text" id="new_cliente" placeholder="Nombre del Cliente" required class="custom-input">
-                        <input type="email" id="new_para" placeholder="Correo Principal (Para)" required class="custom-input">
-                        <input type="text" id="new_cc" placeholder="Con Copia (CC) - Opcional" class="custom-input">
-                        <input type="text" id="new_asunto" placeholder="Asunto (usa [PEDIDO] y [CLIENTE] como variables)" required class="custom-input">
-                        <textarea id="new_cuerpo" placeholder="Cuerpo del correo (usa <br> para saltos de línea y [PEDIDO])" required class="custom-input" rows="4"></textarea>
-                        <button type="submit" class="btn-generar" style="width: fit-content;"><i class="fa-solid fa-plus"></i> Guardar Cliente</button>
-                    </form>
-                </div>
-            </div>
-
             <!-- Vista: Ajustes -->
             <div id="view-ajustes" class="view-section hidden">
                 <header class="top-header">
@@ -106,6 +80,15 @@
                 
                 <div class="form-container" style="background: var(--bg-panel); padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-top: 24px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+                        <div>
+                            <h3 style="margin-bottom: 4px;">Base de Clientes</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Abre la planilla Excel para agregar, editar o eliminar clientes.</p>
+                        </div>
+                        <button class="btn-generar" id="btnAbrirExcel">
+                            <i class="fa-solid fa-file-excel"></i> Abrir Excel
+                        </button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
                         <div>
                             <h3 style="margin-bottom: 4px;">Modo Claro (Light Mode)</h3>
                             <p style="color: var(--text-muted); font-size: 0.9rem;">Cambia el tema visual de oscuro a claro.</p>
