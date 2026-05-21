@@ -5,8 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const clientesTable = document.getElementById('clientesTable');
     
     let clientesData = [];
+    let historialData = [];
 
-    // Navegación (Sidebar)
+    // ── Navegación (Sidebar) ────────────────────────────────
     const navItems = document.querySelectorAll('.nav-item');
     const viewSections = document.querySelectorAll('.view-section');
 
@@ -19,25 +20,27 @@ document.addEventListener('DOMContentLoaded', () => {
             item.classList.add('active');
             const targetId = item.getAttribute('data-target');
             document.getElementById(targetId).classList.remove('hidden');
+
+            // Cargar datos al entrar a la vista
+            if (targetId === 'view-dashboard') loadDashboard();
+            if (targetId === 'view-historial') loadHistorial();
         });
     });
 
-    // Toggle Sidebar
+    // ── Toggle Sidebar ──────────────────────────────────────
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.querySelector('.sidebar');
     
     sidebarToggle.addEventListener('click', () => {
         sidebar.classList.toggle('collapsed');
-        // Guardar preferencia
         localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
     });
     
-    // Restaurar preferencia del sidebar
     if (localStorage.getItem('sidebarCollapsed') === 'true') {
         sidebar.classList.add('collapsed');
     }
 
-    // Light Mode Toggle
+    // ── Light Mode Toggle ───────────────────────────────────
     const lightModeToggle = document.getElementById('lightModeToggle');
     
     lightModeToggle.addEventListener('change', (e) => {
@@ -50,25 +53,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Restaurar preferencia de Light Mode
     if (localStorage.getItem('lightMode') === 'true') {
         lightModeToggle.checked = true;
         document.body.classList.add('light-mode');
     }
 
-    // Outlook Mode Toggle (clasico vs nuevo)
+    // ── Outlook Mode Toggle ─────────────────────────────────
     const outlookModeToggle = document.getElementById('outlookModeToggle');
     
     outlookModeToggle.addEventListener('change', (e) => {
         localStorage.setItem('outlookNuevo', e.target.checked ? 'true' : 'false');
     });
 
-    // Restaurar preferencia de Outlook
     if (localStorage.getItem('outlookNuevo') === 'true') {
         outlookModeToggle.checked = true;
     }
 
-    // 1. Cargar datos del servidor
+    // ═══════════════════════════════════════════════════════
+    // ⭐ FAVORITOS
+    // ═══════════════════════════════════════════════════════
+    function getFavoritos() {
+        try {
+            return JSON.parse(localStorage.getItem('favoritos') || '[]');
+        } catch { return []; }
+    }
+
+    function toggleFavorito(clienteId) {
+        let favs = getFavoritos();
+        const id = String(clienteId);
+        if (favs.includes(id)) {
+            favs = favs.filter(f => f !== id);
+        } else {
+            favs.push(id);
+        }
+        localStorage.setItem('favoritos', JSON.stringify(favs));
+        renderTable(clientesData);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 1. CARGAR CLIENTES
+    // ═══════════════════════════════════════════════════════
     async function loadClientes() {
         try {
             const response = await fetch('/api/clientes');
@@ -76,11 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
             renderTable(clientesData);
         } catch (error) {
             console.error("Error al cargar clientes:", error);
-            alert("Error al cargar la base de datos de clientes.");
         }
     }
 
-    // Boton Refrescar: recarga la lista desde el Excel
+    // Boton Refrescar
     const btnRefrescar = document.getElementById('btnRefrescar');
     btnRefrescar.addEventListener('click', async () => {
         const icono = btnRefrescar.querySelector('i');
@@ -93,7 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 400);
     });
 
-    // 2. Renderizar tabla
+    // ═══════════════════════════════════════════════════════
+    // 2. RENDERIZAR TABLA (con favoritos)
+    // ═══════════════════════════════════════════════════════
     function renderTable(data) {
         clientesBody.innerHTML = '';
         
@@ -106,16 +131,30 @@ document.addEventListener('DOMContentLoaded', () => {
         clientesTable.classList.remove('hidden');
         emptyState.classList.add('hidden');
 
-        data.forEach(cliente => {
+        const favs = getFavoritos();
+
+        // Ordenar: favoritos primero
+        const sorted = [...data].sort((a, b) => {
+            const aFav = favs.includes(String(a.id)) ? 0 : 1;
+            const bFav = favs.includes(String(b.id)) ? 0 : 1;
+            return aFav - bFav;
+        });
+
+        sorted.forEach(cliente => {
             const tr = document.createElement('tr');
             tr.className = 'client-row';
             tr.dataset.id = cliente.id;
 
-            // Preparar el asunto preview
+            const isFav = favs.includes(String(cliente.id));
             const asuntoTpl = cliente.asunto || '';
             const asuntoPreview = asuntoTpl.replace('[CLIENTE]', cliente.cliente).replace('[PEDIDO]', '...');
 
             tr.innerHTML = `
+                <td style="width: 40px; text-align: center;">
+                    <button class="btn-fav ${isFav ? 'active' : ''}" data-id="${cliente.id}" title="Marcar como favorito">
+                        <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
+                    </button>
+                </td>
                 <td>
                     <div class="cliente-name">${cliente.cliente}</div>
                 </td>
@@ -129,7 +168,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
             `;
 
-            // Agregar eventos de Drag & Drop
+            // Evento favorito
+            tr.querySelector('.btn-fav').addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleFavorito(cliente.id);
+            });
+
+            // Drag & Drop
             setupDragAndDrop(tr, cliente.id);
 
             clientesBody.appendChild(tr);
@@ -146,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTable(filtered);
     });
 
-    // 4. Lógica de Drag & Drop por fila
+    // 4. Drag & Drop
     function setupDragAndDrop(row, clienteId) {
         row.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -169,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. Función principal para generar correo
+    // 5. Generar Correo
     window.generarCorreo = async function(clienteId, file = null, row = null) {
         const btn = row ? null : document.querySelector(`tr[data-id="${clienteId}"] .btn-generar`);
         
@@ -180,7 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData();
         formData.append("cliente_id", clienteId);
-        // Enviar modo de Outlook al backend
         const modoOutlook = localStorage.getItem('outlookNuevo') === 'true' ? 'nuevo' : 'clasico';
         formData.append("modo", modoOutlook);
         if (file) {
@@ -206,15 +250,193 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = false;
             }
             if (file) {
-                // Pequeña notificación visual de éxito en la fila
                 row.style.backgroundColor = "var(--success)";
                 setTimeout(() => row.style.backgroundColor = "", 1000);
             }
         }
     };
 
+    // ═══════════════════════════════════════════════════════
+    // 📊 DASHBOARD
+    // ═══════════════════════════════════════════════════════
+    async function loadDashboard() {
+        try {
+            const res = await fetch('/api/stats');
+            const stats = await res.json();
 
-    // Botón Abrir Excel
+            // Animar contadores
+            animateCounter('statHoy', stats.hoy);
+            animateCounter('statSemana', stats.semana);
+            animateCounter('statMes', stats.mes);
+            animateCounter('statTotal', stats.total);
+
+            // Top clientes
+            const topDiv = document.getElementById('topClientes');
+            if (stats.top_clientes.length === 0) {
+                topDiv.innerHTML = '<p style="color: var(--text-muted);">Genera correos para ver estadísticas aquí.</p>';
+                return;
+            }
+
+            const maxCount = stats.top_clientes[0].cantidad;
+            topDiv.innerHTML = stats.top_clientes.map((c, i) => `
+                <div class="top-client-item">
+                    <span class="top-client-rank">#${i + 1}</span>
+                    <div class="top-client-info">
+                        <div class="top-client-name">${c.nombre}</div>
+                        <div class="top-client-bar-bg">
+                            <div class="top-client-bar" style="width: ${(c.cantidad / maxCount * 100)}%"></div>
+                        </div>
+                    </div>
+                    <span class="top-client-count">${c.cantidad}</span>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error("Error al cargar dashboard:", error);
+        }
+    }
+
+    function animateCounter(elementId, target) {
+        const el = document.getElementById(elementId);
+        const current = parseInt(el.textContent) || 0;
+        if (current === target) return;
+
+        const duration = 600;
+        const start = performance.now();
+
+        function step(timestamp) {
+            const progress = Math.min((timestamp - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+            el.textContent = Math.round(current + (target - current) * eased);
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 📝 HISTORIAL
+    // ═══════════════════════════════════════════════════════
+    const historialSearch = document.getElementById('historialSearch');
+    const historialFiltroFecha = document.getElementById('historialFiltroFecha');
+
+    async function loadHistorial() {
+        try {
+            const res = await fetch('/api/historial');
+            historialData = await res.json();
+            renderHistorial();
+        } catch (error) {
+            console.error("Error al cargar historial:", error);
+        }
+    }
+
+    function renderHistorial() {
+        const body = document.getElementById('historialBody');
+        const table = document.getElementById('historialTable');
+        const empty = document.getElementById('historialEmpty');
+
+        // Filtrar por texto
+        const query = (historialSearch?.value || '').toLowerCase();
+        const filtroFecha = historialFiltroFecha?.value || 'todos';
+        const ahora = new Date();
+        const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+
+        let filtered = historialData.filter(entry => {
+            // Filtro texto
+            const matchTexto = !query || 
+                (entry.cliente || '').toLowerCase().includes(query) ||
+                (entry.asunto || '').toLowerCase().includes(query);
+            
+            // Filtro fecha
+            let matchFecha = true;
+            if (filtroFecha !== 'todos') {
+                const entryDate = new Date(entry.timestamp);
+                if (filtroFecha === 'hoy') {
+                    matchFecha = entryDate >= hoy;
+                } else if (filtroFecha === 'semana') {
+                    const inicioSemana = new Date(hoy);
+                    inicioSemana.setDate(hoy.getDate() - hoy.getDay() + 1); // Lunes
+                    matchFecha = entryDate >= inicioSemana;
+                } else if (filtroFecha === 'mes') {
+                    const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+                    matchFecha = entryDate >= inicioMes;
+                }
+            }
+
+            return matchTexto && matchFecha;
+        });
+
+        body.innerHTML = '';
+
+        if (filtered.length === 0) {
+            table.classList.add('hidden');
+            empty.classList.remove('hidden');
+            return;
+        }
+
+        table.classList.remove('hidden');
+        empty.classList.add('hidden');
+
+        filtered.forEach(entry => {
+            const tr = document.createElement('tr');
+            const fecha = new Date(entry.timestamp);
+            const fechaStr = fecha.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }) 
+                           + ' ' + fecha.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+            
+            const modoClass = entry.modo === 'clasico' ? 'badge-clasico' : 'badge-nuevo';
+            const modoLabel = entry.modo === 'clasico' ? 'Clásico' : 'Nuevo';
+            const adjuntoHtml = entry.archivo 
+                ? `<span class="badge-adjunto"><i class="fa-solid fa-paperclip"></i> ${entry.archivo}</span>`
+                : `<span style="color: var(--text-muted); font-size: 0.85rem;">—</span>`;
+
+            tr.innerHTML = `
+                <td style="font-size: 0.85rem; white-space: nowrap;">${fechaStr}</td>
+                <td><span class="cliente-name" style="font-size: 0.9rem;">${entry.cliente || ''}</span></td>
+                <td><span style="color: var(--text-muted); font-size: 0.85rem;">${entry.asunto || ''}</span></td>
+                <td>${adjuntoHtml}</td>
+                <td><span class="badge-modo ${modoClass}">${modoLabel}</span></td>
+            `;
+            body.appendChild(tr);
+        });
+    }
+
+    // Eventos de filtro del historial
+    if (historialSearch) {
+        historialSearch.addEventListener('input', renderHistorial);
+    }
+    if (historialFiltroFecha) {
+        historialFiltroFecha.addEventListener('change', renderHistorial);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 🔄 AUTO-RECARGA EXCEL
+    // ═══════════════════════════════════════════════════════
+    let lastExcelTimestamp = 0;
+
+    async function checkExcelChanges() {
+        try {
+            const res = await fetch('/api/excel_timestamp');
+            const data = await res.json();
+            if (lastExcelTimestamp > 0 && data.timestamp > lastExcelTimestamp) {
+                // Excel cambió — recargar
+                await loadClientes();
+                // Flash sutil en el botón de refrescar
+                const icono = btnRefrescar.querySelector('i');
+                icono.classList.add('fa-spin');
+                setTimeout(() => icono.classList.remove('fa-spin'), 600);
+            }
+            lastExcelTimestamp = data.timestamp;
+        } catch (error) {
+            // Silencioso — no interrumpir
+        }
+    }
+
+    // Polling cada 10 segundos
+    setInterval(checkExcelChanges, 10000);
+    // Obtener timestamp inicial
+    checkExcelChanges();
+
+    // ═══════════════════════════════════════════════════════
+    // BOTÓN ABRIR EXCEL
+    // ═══════════════════════════════════════════════════════
     const btnAbrirExcel = document.getElementById('btnAbrirExcel');
     if (btnAbrirExcel) {
         btnAbrirExcel.addEventListener('click', async () => {

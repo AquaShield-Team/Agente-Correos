@@ -1,10 +1,12 @@
 import os
 import re
 import sys
+import json
 import uuid
 import shutil
 import webbrowser
 import urllib.parse
+from datetime import datetime, timedelta
 import pythoncom
 import openpyxl
 import win32com.client
@@ -19,6 +21,7 @@ else:
     DIRECTORIO_ACTUAL = BUNDLE_DIR
 
 ARCHIVO_DB = os.path.join(DIRECTORIO_ACTUAL, "Base_Clientes.xlsx")
+HISTORIAL_FILE = os.path.join(DIRECTORIO_ACTUAL, "historial.json")
 UPLOAD_FOLDER = os.path.join(DIRECTORIO_ACTUAL, "uploads")
 
 app = Flask(__name__,
@@ -86,7 +89,26 @@ def limpiar_parrafos_vacios(html):
     return resultado
 
 
-# ── Rutas ─────────────────────────────────────────────────────
+# ── Historial ─────────────────────────────────────────────────────
+
+def cargar_historial():
+    if not os.path.exists(HISTORIAL_FILE):
+        return []
+    try:
+        with open(HISTORIAL_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError):
+        return []
+
+
+def guardar_historial(entrada):
+    historial = cargar_historial()
+    historial.insert(0, entrada)  # Mas reciente primero
+    with open(HISTORIAL_FILE, "w", encoding="utf-8") as f:
+        json.dump(historial, f, ensure_ascii=False, indent=2)
+
+
+# ── Rutas ─────────────────────────────────────────────────────────
 
 @app.route("/")
 def index():
@@ -145,6 +167,18 @@ def generar_correo():
             if archivo_adjunto and archivo_adjunto.filename:
                 msg += " NOTA: Debes adjuntar el archivo manualmente en la ventana de Outlook."
 
+            # Registrar en historial
+            archivo_nombre = archivo_adjunto.filename if (archivo_adjunto and archivo_adjunto.filename) else ""
+            guardar_historial({
+                "timestamp": datetime.now().isoformat(),
+                "cliente_id": cliente_id,
+                "cliente": cliente["cliente"],
+                "para": cliente.get("para", ""),
+                "asunto": asunto,
+                "archivo": archivo_nombre,
+                "modo": "nuevo"
+            })
+
             return jsonify({"success": True, "message": msg, "modo": "nuevo"})
 
         # ── Modo: Outlook Clasico (COM) ───────────────────────
@@ -199,12 +233,82 @@ def generar_correo():
             except Exception as e:
                 print(f"No se pudo eliminar el archivo temporal: {e}")
 
+        # Registrar en historial
+        archivo_nombre = os.path.basename(ruta_archivo) if ruta_archivo else ""
+        # Limpiar el prefijo UUID del nombre
+        if archivo_nombre and "_" in archivo_nombre:
+            archivo_nombre = "_".join(archivo_nombre.split("_")[1:])
+        guardar_historial({
+            "timestamp": datetime.now().isoformat(),
+            "cliente_id": cliente_id,
+            "cliente": cliente["cliente"],
+            "para": cliente.get("para", ""),
+            "asunto": asunto,
+            "archivo": archivo_nombre,
+            "modo": "clasico"
+        })
+
         return jsonify({"success": True, "message": "Correo abierto en Outlook Clasico", "modo": "clasico"})
 
     except Exception as e:
         import traceback
         traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/historial", methods=["GET"])
+def api_historial():
+    return jsonify(cargar_historial())
+
+
+@app.route("/api/stats", methods=["GET"])
+def api_stats():
+    historial = cargar_historial()
+    ahora = datetime.now()
+    hoy = ahora.date()
+    inicio_semana = hoy - timedelta(days=hoy.weekday())
+    inicio_mes = hoy.replace(day=1)
+
+    correos_hoy = 0
+    correos_semana = 0
+    correos_mes = 0
+    clientes_conteo = {}
+
+    for entry in historial:
+        try:
+            fecha = datetime.fromisoformat(entry["timestamp"]).date()
+        except (ValueError, KeyError):
+            continue
+        if fecha == hoy:
+            correos_hoy += 1
+        if fecha >= inicio_semana:
+            correos_semana += 1
+        if fecha >= inicio_mes:
+            correos_mes += 1
+        nombre = entry.get("cliente", "Desconocido")
+        clientes_conteo[nombre] = clientes_conteo.get(nombre, 0) + 1
+
+    # Top 3 clientes
+    top_clientes = sorted(clientes_conteo.items(), key=lambda x: x[1], reverse=True)[:3]
+
+    return jsonify({
+        "hoy": correos_hoy,
+        "semana": correos_semana,
+        "mes": correos_mes,
+        "total": len(historial),
+        "top_clientes": [{"nombre": c[0], "cantidad": c[1]} for c in top_clientes]
+    })
+
+
+@app.route("/api/excel_timestamp", methods=["GET"])
+def excel_timestamp():
+    try:
+        if os.path.exists(ARCHIVO_DB):
+            mtime = os.path.getmtime(ARCHIVO_DB)
+            return jsonify({"timestamp": mtime})
+        return jsonify({"timestamp": 0})
+    except Exception:
+        return jsonify({"timestamp": 0})
 
 
 if __name__ == "__main__":

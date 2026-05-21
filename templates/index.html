@@ -25,12 +25,15 @@
             </div>
             <nav class="nav-menu">
                 <a href="#" class="nav-item active" data-target="view-correos" title="Correos"><i class="fa-solid fa-envelope"></i> <span class="nav-text">Correos</span></a>
+                <a href="#" class="nav-item" data-target="view-dashboard" title="Dashboard"><i class="fa-solid fa-chart-bar"></i> <span class="nav-text">Dashboard</span></a>
+                <a href="#" class="nav-item" data-target="view-historial" title="Historial"><i class="fa-solid fa-clock-rotate-left"></i> <span class="nav-text">Historial</span></a>
                 <a href="#" class="nav-item" data-target="view-ajustes" title="Ajustes"><i class="fa-solid fa-gear"></i> <span class="nav-text">Ajustes</span></a>
             </nav>
         </aside>
 
         <!-- Contenido Principal -->
         <main class="main-content">
+            <!-- Vista: Correos -->
             <div id="view-correos" class="view-section">
                 <header class="top-header">
                     <div class="header-title">
@@ -53,6 +56,7 @@
                     <table id="clientesTable">
                         <thead>
                             <tr>
+                                <th style="width: 40px;"></th>
                                 <th>Cliente</th>
                                 <th>Asunto</th>
                                 <th class="actions-col">Acción</th>
@@ -65,6 +69,90 @@
                     <div id="emptyState" class="empty-state hidden">
                         <i class="fa-solid fa-folder-open"></i>
                         <p>No se encontraron clientes.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Vista: Dashboard -->
+            <div id="view-dashboard" class="view-section hidden">
+                <header class="top-header">
+                    <div class="header-title">
+                        <h1>Dashboard</h1>
+                        <p>Resumen de actividad del agente de correos.</p>
+                    </div>
+                </header>
+
+                <div class="stat-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                        <div class="stat-number" id="statHoy">0</div>
+                        <div class="stat-label">Hoy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-week"></i></div>
+                        <div class="stat-number" id="statSemana">0</div>
+                        <div class="stat-label">Esta Semana</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar"></i></div>
+                        <div class="stat-number" id="statMes">0</div>
+                        <div class="stat-label">Este Mes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+                        <div class="stat-number" id="statTotal">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                </div>
+
+                <div class="top-clients-card">
+                    <h3>Clientes Más Frecuentes</h3>
+                    <div id="topClientes" class="top-clients-list">
+                        <p style="color: var(--text-muted);">Genera correos para ver estadísticas aquí.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista: Historial -->
+            <div id="view-historial" class="view-section hidden">
+                <header class="top-header">
+                    <div class="header-title">
+                        <h1>Historial de Correos</h1>
+                        <p>Registro de todos los correos generados.</p>
+                    </div>
+                </header>
+
+                <section class="toolbar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="historialSearch" placeholder="Buscar por cliente o asunto...">
+                    </div>
+                    <select id="historialFiltroFecha" class="filtro-fecha">
+                        <option value="todos">Todos</option>
+                        <option value="hoy">Hoy</option>
+                        <option value="semana">Esta semana</option>
+                        <option value="mes">Este mes</option>
+                    </select>
+                </section>
+
+                <section class="table-container">
+                    <table id="historialTable">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Asunto</th>
+                                <th>Adjunto</th>
+                                <th>Modo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialBody">
+                            <!-- Llenado dinámico -->
+                        </tbody>
+                    </table>
+                    <div id="historialEmpty" class="empty-state hidden">
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>No hay correos en el historial.</p>
                     </div>
                 </section>
             </div>

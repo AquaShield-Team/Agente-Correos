@@ -9,6 +9,9 @@ uploads/
 # Base de datos de clientes (cada equipo tiene la suya)
 Base_Clientes.xlsx
 
+# Historial de correos (local por equipo)
+historial.json
+
 # Python cache
 __pycache__/
 *.py[cod]
