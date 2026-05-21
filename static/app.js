@@ -214,7 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-
     // Botón Abrir Excel
     const btnAbrirExcel = document.getElementById('btnAbrirExcel');
     if (btnAbrirExcel) {

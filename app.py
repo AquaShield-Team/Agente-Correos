@@ -137,13 +137,6 @@ def api_clientes():
         return jsonify({"success": True, "cliente": nuevo_cliente})
 
 
-@app.route("/api/clientes/<cliente_id>", methods=["DELETE"])
-def delete_cliente(cliente_id):
-    clientes = cargar_clientes()
-    clientes = [c for c in clientes if str(c["id"]) != str(cliente_id)]
-    guardar_clientes(clientes)
-    return jsonify({"success": True})
-
 
 @app.route("/api/abrir_excel", methods=["GET"])
 def abrir_excel():
