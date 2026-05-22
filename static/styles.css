@@ -483,6 +483,34 @@ input:checked + .slider:before {
     opacity: 1;
 }
 
+/* ── Separador Favoritos / Clientes ──────────────────────── */
+.fav-separator td {
+    padding: 4px 0 !important;
+    border: none !important;
+}
+
+.separator-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.separator-line::before,
+.separator-line::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.separator-line span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+
 /* ── Dashboard Stat Cards ────────────────────────────────── */
 .stat-cards {
     display: grid;

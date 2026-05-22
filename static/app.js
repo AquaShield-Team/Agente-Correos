@@ -154,14 +154,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const favs = getFavoritos();
 
-        // Ordenar: favoritos primero
-        const sorted = [...data].sort((a, b) => {
-            const aFav = favs.includes(String(a.id)) ? 0 : 1;
-            const bFav = favs.includes(String(b.id)) ? 0 : 1;
-            return aFav - bFav;
-        });
+        // Separar en dos grupos y ordenar cada uno A-Z
+        const favoritos = data.filter(c => favs.includes(String(c.id)))
+            .sort((a, b) => a.cliente.localeCompare(b.cliente, 'es'));
+        const noFavoritos = data.filter(c => !favs.includes(String(c.id)))
+            .sort((a, b) => a.cliente.localeCompare(b.cliente, 'es'));
 
-        sorted.forEach(cliente => {
+        // Renderizar favoritos
+        favoritos.forEach(cliente => appendClientRow(cliente, favs));
+
+        // Línea separadora si hay favoritos Y no-favoritos
+        if (favoritos.length > 0 && noFavoritos.length > 0) {
+            const sep = document.createElement('tr');
+            sep.className = 'fav-separator';
+            sep.innerHTML = `<td colspan="4"><div class="separator-line"><span>CLIENTES</span></div></td>`;
+            clientesBody.appendChild(sep);
+        }
+
+        // Renderizar no-favoritos
+        noFavoritos.forEach(cliente => appendClientRow(cliente, favs));
+    }
+
+    function appendClientRow(cliente, favs) {
             const tr = document.createElement('tr');
             tr.className = 'client-row';
             tr.dataset.id = cliente.id;
@@ -204,7 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setupDragAndDrop(tr, cliente.id);
 
             clientesBody.appendChild(tr);
-        });
     }
 
     // 3. Filtrar clientes
