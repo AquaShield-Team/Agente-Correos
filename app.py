@@ -54,11 +54,12 @@ def cargar_clientes():
                 return str(int(val))
         return str(val)
 
-    for row in ws.iter_rows(min_row=2, values_only=True):
+    for idx, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=1):
         if not row or len(row) < 2 or not row[1]:
             continue
         clientes.append({
-            "id": safe_cell(row, 0),
+            "id": idx,
+            "codigo": safe_cell(row, 0),
             "cliente": safe_cell(row, 1),
             "para": safe_cell(row, 2),
             "cc": safe_cell(row, 3),
