@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import json
+import time
 import uuid
 import shutil
 import webbrowser
@@ -236,11 +237,16 @@ def generar_correo():
         # Adjuntar todos los archivos
         for ruta in rutas_archivos:
             mail.Attachments.Add(ruta)
+
+        # Esperar a que Outlook procese los adjuntos antes de limpiar
+        time.sleep(2)
+
+        # Limpiar archivos temporales
+        for ruta in rutas_archivos:
             try:
                 os.remove(ruta)
-            except Exception as e:
-                print(f"No se pudo eliminar el archivo temporal: {e}")
-        # Limpiar subcarpeta temporal
+            except Exception:
+                pass
         try:
             os.rmdir(subfolder)
         except Exception:
