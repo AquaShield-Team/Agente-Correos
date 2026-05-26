@@ -1,0 +1,91 @@
+============================================================
+  AQUASHIELD - AGENTE DE CORREOS
+  Guía de Instalación y Uso
+============================================================
+
+REQUISITOS
+----------
+- Windows 10/11
+- Python 3.10 o superior (https://www.python.org/downloads/)
+  IMPORTANTE: Al instalar Python, marcar "Add Python to PATH"
+- Microsoft Outlook (versión escritorio)
+- Git (https://git-scm.com/downloads)
+
+
+INSTALACIÓN (3 pasos)
+---------------------
+
+1. Abrir PowerShell y clonar el repositorio:
+
+   git clone https://github.com/AquaShield-Team/Agente-Correos.git
+   cd Agente-Correos
+
+2. Instalar dependencias:
+
+   pip install -r requirements.txt
+
+3. Copiar el archivo "Base_Clientes.xlsx" a la carpeta Agente-Correos/
+   (Pedirlo a un compañero, no se sube al repositorio)
+
+
+EJECUTAR
+--------
+Abrir PowerShell en la carpeta del proyecto y ejecutar:
+
+   python app.py
+
+Luego abrir el navegador en:
+
+   http://localhost:5055
+
+
+ACTUALIZAR
+----------
+Para obtener la última versión, abrir PowerShell en la carpeta y ejecutar:
+
+   git pull
+
+
+CÓMO USAR
+---------
+- GENERAR CORREO: Click en el botón de avión de papel del cliente.
+- ADJUNTAR ARCHIVOS: Arrastrar uno o varios archivos desde el explorador
+  y soltarlos sobre la fila del cliente.
+- FAVORITOS: Click en la estrella para marcar un cliente como favorito.
+  Los favoritos aparecen arriba ordenados alfabéticamente.
+- BUSCAR: Escribir en la barra de búsqueda para filtrar por nombre o correo.
+- DASHBOARD: Ver estadísticas de correos enviados (hoy, semana, mes).
+- HISTORIAL: Registro de todos los correos generados con filtros.
+- EXPORTAR: Botón "Exportar Excel" en la vista Historial.
+- ABRIR EXCEL: En Ajustes, botón para abrir la base de clientes.
+
+
+AJUSTES
+-------
+- Modo Claro: Toggle en Ajustes para cambiar el tema visual.
+- Outlook Nuevo: Activar si usas la nueva versión de Outlook.
+  NOTA: Outlook Nuevo no soporta adjuntos automáticos ni firma con formato.
+
+
+SOLUCIÓN DE PROBLEMAS
+---------------------
+ERROR: "Outlook no puede hacer esto porque hay un cuadro de diálogo abierto"
+  -> Cerrar todas las ventanas emergentes de Outlook e intentar de nuevo.
+
+ERROR: "No se encontraron clientes"
+  -> Verificar que Base_Clientes.xlsx existe en la carpeta del proyecto.
+
+ERROR: Los adjuntos no aparecen en el correo
+  -> Asegurarse de usar Outlook Clásico (no Outlook Nuevo).
+  -> Hacer git pull para obtener la última versión.
+
+ERROR: "pip no se reconoce como comando"
+  -> Reinstalar Python marcando "Add Python to PATH".
+
+
+CONTACTO
+--------
+Proyecto AquaShield - AquaChile
+Repositorio: https://github.com/AquaShield-Team/Agente-Correos
+
+============================================================
