@@ -202,8 +202,9 @@ def generar_correo():
         archivos = request.files.getlist("archivo")
         rutas_archivos = []
         nombres_archivos = []
-        # Subcarpeta única para evitar colisiones sin renombrar archivos
-        subfolder = os.path.join(app.config['UPLOAD_FOLDER'], uuid.uuid4().hex)
+        # Usar carpeta TEMP del sistema (evita bloqueos de OneDrive)
+        import tempfile
+        subfolder = os.path.join(tempfile.gettempdir(), "AquaShield_" + uuid.uuid4().hex)
         os.makedirs(subfolder, exist_ok=True)
         for archivo in archivos:
             if archivo and archivo.filename:
@@ -251,10 +252,12 @@ def generar_correo():
 
         # Adjuntar todos los archivos
         for ruta in rutas_archivos:
-            mail.Attachments.Add(ruta)
+            ruta_abs = os.path.abspath(ruta)
+            print(f"[ADJUNTO] Adjuntando: {ruta_abs}")
+            mail.Attachments.Add(ruta_abs)
 
         # Esperar a que Outlook procese los adjuntos antes de limpiar
-        time.sleep(2)
+        time.sleep(3)
 
         # Limpiar archivos temporales
         for ruta in rutas_archivos:
