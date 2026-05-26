@@ -161,14 +161,29 @@ def generar_correo():
                 params["cc"] = cc
 
             mailto_url = f"mailto:{para}?{urllib.parse.urlencode(params, quote_via=urllib.parse.quote)}"
-            webbrowser.open(mailto_url)
 
-            # Nota sobre adjuntos
+            # Guardar adjuntos en carpeta del Escritorio
             archivos = request.files.getlist("archivo")
             nombres_archivos = [f.filename for f in archivos if f and f.filename]
+
+            if nombres_archivos:
+                desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+                if not os.path.exists(desktop):
+                    desktop = os.path.join(os.path.expanduser("~"), "Escritorio")
+                carpeta_adjuntos = os.path.join(desktop, "Adjuntos_AquaShield")
+                os.makedirs(carpeta_adjuntos, exist_ok=True)
+                for archivo in archivos:
+                    if archivo and archivo.filename:
+                        archivo.save(os.path.join(carpeta_adjuntos, archivo.filename))
+                # Abrir la carpeta para que el usuario arrastre al correo
+                os.startfile(carpeta_adjuntos)
+
+            # Abrir el correo
+            webbrowser.open(mailto_url)
+
             msg = "Correo abierto en Outlook Nuevo."
             if nombres_archivos:
-                msg += f" NOTA: Debes adjuntar {len(nombres_archivos)} archivo(s) manualmente."
+                msg += f" Los {len(nombres_archivos)} archivo(s) están en la carpeta 'Adjuntos_AquaShield' del Escritorio. Arrástralos al correo."
 
             # Registrar en historial
             guardar_historial({

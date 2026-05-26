@@ -17,12 +17,11 @@ INSTALACIÓN (3 pasos)
 
 1. Abrir PowerShell y clonar el repositorio:
 
-   git clone https://github.com/AquaShield-Team/Agente-Correos.git
-   cd Agente-Correos
+git clone https://github.com/AquaShield-Team/Agente-Correos.git cd Agente-Correos
 
 2. Instalar dependencias:
 
-   pip install -r requirements.txt
+pip install -r requirements.txt
 
 3. Copiar el archivo "Base_Clientes.xlsx" a la carpeta Agente-Correos/
    (Pedirlo a un compañero, no se sube al repositorio)
@@ -85,7 +84,8 @@ ERROR: "pip no se reconoce como comando"
 
 CONTACTO
 --------
-Proyecto AquaShield - AquaChile
-Repositorio: https://github.com/AquaShield-Team/Agente-Correos
+Marcelo Ramírez
+marcelo.ramirez@aquachile.com
++569 87634637
 
 ============================================================
