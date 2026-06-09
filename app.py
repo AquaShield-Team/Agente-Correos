@@ -4,6 +4,7 @@ import sys
 import json
 import time
 import uuid
+import tempfile
 import shutil
 import webbrowser
 import urllib.parse
@@ -203,7 +204,6 @@ def generar_correo():
         rutas_archivos = []
         nombres_archivos = []
         # Usar carpeta TEMP del sistema (evita bloqueos de OneDrive)
-        import tempfile
         subfolder = os.path.join(tempfile.gettempdir(), "AquaShield_" + uuid.uuid4().hex)
         os.makedirs(subfolder, exist_ok=True)
         for archivo in archivos:
@@ -214,57 +214,61 @@ def generar_correo():
                 nombres_archivos.append(archivo.filename)
 
         pythoncom.CoInitialize()
-        outlook = win32com.client.Dispatch("Outlook.Application")
-        mail = outlook.CreateItem(0)
+        try:
+            outlook = win32com.client.Dispatch("Outlook.Application")
+            mail = outlook.CreateItem(0)
 
-        def formatear_correos(correos_str):
-            if not correos_str:
-                return ""
-            lista = [e.strip() for e in re.split(r'[,;]+', correos_str) if e.strip()]
-            return "; ".join(lista)
+            def formatear_correos(correos_str):
+                if not correos_str:
+                    return ""
+                lista = [e.strip() for e in re.split(r'[,;]+', correos_str) if e.strip()]
+                return "; ".join(lista)
 
-        mail.Display()
+            mail.Display()
 
-        mail.To = formatear_correos(cliente.get("para", ""))
-        mail.CC = formatear_correos(cliente.get("cc", ""))
-        mail.Subject = asunto
+            mail.To = formatear_correos(cliente.get("para", ""))
+            mail.CC = formatear_correos(cliente.get("cc", ""))
+            mail.Subject = asunto
 
-        # Capturar HTML de Outlook (firma)
-        firma_html = mail.HTMLBody
-        cuerpo_html = "<p class=MsoNormal style='margin:0;padding:0'><span style='font-family:Calibri,sans-serif;font-size:11.0pt'>" + cuerpo + "</span></p><br>"
+            # Capturar HTML de Outlook (firma)
+            firma_html = mail.HTMLBody
+            cuerpo_html = "<p class=MsoNormal style='margin:0;padding:0'><span style='font-family:Calibri,sans-serif;font-size:11.0pt'>" + cuerpo + "</span></p><br>"
 
-        # Inyectar dentro de WordSection1, limpiando parrafos vacios
-        ws_match = re.search(r'<div\s+class=\s*["\']?WordSection1["\']?\s*>', firma_html, re.IGNORECASE)
-        if ws_match:
-            antes = firma_html[:ws_match.end()]
-            despues = firma_html[ws_match.end():]
-            despues = limpiar_parrafos_vacios(despues)
-            mail.HTMLBody = antes + cuerpo_html + despues
-        else:
-            body_match = re.search(r'<body[^>]*>', firma_html, re.IGNORECASE)
-            if body_match:
-                antes = firma_html[:body_match.end()]
-                despues = firma_html[body_match.end():]
+            # Inyectar dentro de WordSection1, limpiando parrafos vacios
+            ws_match = re.search(r'<div\s+class=\s*["\']?WordSection1["\']?\s*>', firma_html, re.IGNORECASE)
+            if ws_match:
+                antes = firma_html[:ws_match.end()]
+                despues = firma_html[ws_match.end():]
                 despues = limpiar_parrafos_vacios(despues)
                 mail.HTMLBody = antes + cuerpo_html + despues
             else:
-                mail.HTMLBody = cuerpo_html + firma_html
+                body_match = re.search(r'<body[^>]*>', firma_html, re.IGNORECASE)
+                if body_match:
+                    antes = firma_html[:body_match.end()]
+                    despues = firma_html[body_match.end():]
+                    despues = limpiar_parrafos_vacios(despues)
+                    mail.HTMLBody = antes + cuerpo_html + despues
+                else:
+                    mail.HTMLBody = cuerpo_html + firma_html
 
-        # Adjuntar todos los archivos
-        for ruta in rutas_archivos:
-            ruta_abs = os.path.abspath(ruta)
-            print(f"[ADJUNTO] Adjuntando: {ruta_abs}")
-            mail.Attachments.Add(ruta_abs)
+            # Adjuntar todos los archivos
+            for ruta in rutas_archivos:
+                ruta_abs = os.path.abspath(ruta)
+                print(f"[ADJUNTO] Adjuntando: {ruta_abs}")
+                mail.Attachments.Add(ruta_abs)
 
-        # Esperar a que Outlook procese los adjuntos antes de limpiar
-        time.sleep(3)
+            # Esperar a que Outlook procese los adjuntos antes de limpiar
+            time.sleep(3)
+
+        finally:
+            pythoncom.CoUninitialize()
 
         # Limpiar archivos temporales
         for ruta in rutas_archivos:
             try:
                 os.remove(ruta)
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"[WARN] No se pudo limpiar {ruta}: {e}")
         try:
             os.rmdir(subfolder)
         except Exception:

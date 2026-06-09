@@ -7,6 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let clientesData = [];
     let historialData = [];
 
+    // ── Utilidad: escapar HTML para prevenir XSS ────────────
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
     // ── Navegación (Sidebar) ────────────────────────────────
     const navItems = document.querySelectorAll('.nav-item');
     const viewSections = document.querySelectorAll('.view-section');
@@ -108,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 1. CARGAR CLIENTES
     // ═══════════════════════════════════════════════════════
     async function loadClientes() {
         showSkeletons();
@@ -181,6 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const asuntoTpl = cliente.asunto || '';
             const asuntoPreview = asuntoTpl.replace('[CLIENTE]', cliente.cliente).replace('[PEDIDO]', '...');
 
+            const safeCliente = escapeHtml(cliente.cliente);
+            const safePara = escapeHtml(cliente.para) || '—';
+            const safeCc = escapeHtml(cliente.cc) || '—';
+            const safeCuerpo = (cliente.cuerpo || '').replace(/<br\s*\/?>/gi, ' ');
+            const safeCuerpoPreview = escapeHtml(safeCuerpo.substring(0, 100)) + (safeCuerpo.length > 100 ? '...' : '');
+
             tr.innerHTML = `
                 <td style="width: 40px; text-align: center;">
                     <button class="btn-fav ${isFav ? 'active' : ''}" data-id="${cliente.id}" title="Marcar como favorito">
@@ -188,15 +201,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 </td>
                 <td class="td-cliente-name">
-                    <div class="cliente-name">${cliente.cliente}</div>
+                    <div class="cliente-name">${safeCliente}</div>
                     <div class="cliente-tooltip">
-                        <div class="tooltip-row"><strong>Para:</strong> ${cliente.para || '—'}</div>
-                        <div class="tooltip-row"><strong>CC:</strong> ${cliente.cc || '—'}</div>
-                        <div class="tooltip-row"><strong>Cuerpo:</strong> ${(cliente.cuerpo || '').replace(/<br\s*\/?>/gi, ' ').substring(0, 100)}${(cliente.cuerpo || '').length > 100 ? '...' : ''}</div>
+                        <div class="tooltip-row"><strong>Para:</strong> ${safePara}</div>
+                        <div class="tooltip-row"><strong>CC:</strong> ${safeCc}</div>
+                        <div class="tooltip-row"><strong>Cuerpo:</strong> ${safeCuerpoPreview}</div>
                     </div>
                 </td>
                 <td>
-                    <div class="asunto-preview" title="${asuntoPreview}">${asuntoPreview}</div>
+                    <div class="asunto-preview" title="${escapeHtml(asuntoPreview)}">${escapeHtml(asuntoPreview)}</div>
                 </td>
                 <td class="actions-col">
                     <button class="btn-generar" onclick="generarCorreo(${cliente.id})" title="Generar Correo">
@@ -313,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Top clientes
             const topDiv = document.getElementById('topClientes');
             if (stats.top_clientes.length === 0) {
-                topDiv.innerHTML = '<p style="color: var(--text-muted);">Genera correos para ver estadísticas aquí.</p>';
+                topDiv.innerHTML = '<p style="color: var(--text-secondary);">Genera correos para ver estadísticas aquí.</p>';
                 return;
             }
 
@@ -425,12 +438,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const modoLabel = entry.modo === 'clasico' ? 'Clásico' : 'Nuevo';
             const adjuntoHtml = entry.archivo 
                 ? `<span class="badge-adjunto"><i class="fa-solid fa-paperclip"></i> ${entry.archivo}</span>`
-                : `<span style="color: var(--text-muted); font-size: 0.85rem;">—</span>`;
+                : `<span style="color: var(--text-secondary); font-size: 0.85rem;">—</span>`;
 
             tr.innerHTML = `
                 <td style="font-size: 0.85rem; white-space: nowrap;">${fechaStr}</td>
                 <td><span class="cliente-name" style="font-size: 0.9rem;">${entry.cliente || ''}</span></td>
-                <td><span style="color: var(--text-muted); font-size: 0.85rem;">${entry.asunto || ''}</span></td>
+                <td><span style="color: var(--text-secondary); font-size: 0.85rem;">${entry.asunto || ''}</span></td>
                 <td>${adjuntoHtml}</td>
                 <td><span class="badge-modo ${modoClass}">${modoLabel}</span></td>
             `;
