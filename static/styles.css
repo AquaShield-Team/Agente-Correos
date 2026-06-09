@@ -132,14 +132,14 @@ body {
 
 /* ── Logo swap light/dark ────────────────────────────────── */
 .brand-logo-wrap {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
     transition: width 0.3s ease, height 0.3s ease;
 }
 
 .brand-logo-wrap img {
-    height: 40px;
+    height: 36px;
     width: auto;
     object-fit: contain;
 }
@@ -165,14 +165,14 @@ body {
 
 .brand-name strong {
     font-family: var(--font-heading);
-    font-size: 1.05rem;
+    font-size: 1.35rem;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     color: var(--text-primary);
 }
 
 .brand-subtitle {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 400;
     color: var(--text-secondary);
     letter-spacing: 0.5px;
@@ -190,6 +190,48 @@ body {
 
 .btn-toggle:hover {
     color: var(--text-primary);
+}
+
+/* ── Sidebar: Módulo Label (estándar AQUASHIELD) ─────────── */
+.sidebar-module-label {
+    padding: 0 24px;
+    margin-bottom: 24px;
+}
+
+.header-separator-h {
+    height: 1.5px;
+    background: var(--color-separator);
+    margin-bottom: 12px;
+}
+
+.module-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.module-label {
+    font-family: var(--font-heading);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+
+.module-name {
+    font-family: var(--font-primary);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    line-height: 1.15;
+    letter-spacing: 1px;
+}
+
+.sidebar.collapsed .sidebar-module-label {
+    display: none;
 }
 
 /* ── Navigation ──────────────────────────────────────────── */
