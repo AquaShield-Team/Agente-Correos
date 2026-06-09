@@ -40,22 +40,19 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebar.classList.add('collapsed');
     }
 
-    // ── Light Mode Toggle ───────────────────────────────────
+    // ── Theme Toggle (data-theme) ─────────────────────────────
     const lightModeToggle = document.getElementById('lightModeToggle');
     
     lightModeToggle.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            document.body.classList.add('light-mode');
-            localStorage.setItem('lightMode', 'true');
-        } else {
-            document.body.classList.remove('light-mode');
-            localStorage.setItem('lightMode', 'false');
-        }
+        const newTheme = e.target.checked ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
     });
 
-    if (localStorage.getItem('lightMode') === 'true') {
+    // Sincronizar toggle con el tema actual (puede venir del script inline del head)
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    if (currentTheme === 'light') {
         lightModeToggle.checked = true;
-        document.body.classList.add('light-mode');
     }
 
     // ── Outlook Mode Toggle ─────────────────────────────────

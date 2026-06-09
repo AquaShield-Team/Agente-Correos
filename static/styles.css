@@ -1,42 +1,60 @@
 /* ============================================================
    AquaShield · Agente de Correos
-   Paleta basada en Manual de Marca AquaChile (Pantone 7545 C)
+   Marca: Manual AquaChile (Pantone 7545 C / 021 C)
+   Skill: aplicar-marca-aquachile v2
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Quicksand:wght@500;700&display=swap');
 
-:root {
-    --bg-dark: #2d3a45;
-    --bg-panel: #3a4a58;
-    --bg-hover: #445563;
-    --text-main: #f8fafc;
-    --text-muted: #8fa0b0;
-    --accent: #EB5F0A;       /* Pantone 021 C — Naranja corporativo */
-    --success: #10b981;
-    --border: #4a5a68;
-    --drop-active: rgba(235, 95, 10, 0.15);
+/* ── Variables: Light Mode (default) ─────────────────────── */
+:root,
+[data-theme="light"] {
+    --bg-page: #F7FAFC;
+    --bg-header: #FFFFFF;
+    --bg-tertiary: #EDF2F7;
+    --text-primary: #445563;
+    --text-secondary: #8F9CA7;
+    --color-accent: #EB5F0A;
+    --color-separator: #B4A28D;
+    --border-color: #E2E8F0;
+    --shadow: 0 2px 12px rgba(68, 85, 99, 0.08);
+    --success: #6C8B8B;
+    --danger: #C76728;
+    --warning: #EB5F0A;
+    --info: #445563;
+    --drop-active: rgba(235, 95, 10, 0.08);
+    --font-primary: 'Inter', 'Segoe UI', sans-serif;
+    --font-heading: 'Quicksand', sans-serif;
 }
 
-body.light-mode {
-    --bg-dark: #EFE9E5;      /* Warm Gray 1 C */
-    --bg-panel: #ffffff;
-    --bg-hover: #f5f0ec;
-    --text-main: #445563;    /* Pantone 7545 C */
-    --text-muted: #6b7d8d;
-    --border: #d9d0c7;
-    --drop-active: rgba(235, 95, 10, 0.08);
+/* ── Variables: Dark Mode ────────────────────────────────── */
+[data-theme="dark"] {
+    --bg-page: #1E2D3B;
+    --bg-header: #1E2D3B;       /* IGUAL que --bg-page → sin cajitas */
+    --bg-tertiary: #2C3E50;
+    --text-primary: #E2E8F0;
+    --text-secondary: #94A3B8;
+    --color-accent: #EB5F0A;    /* NUNCA cambia */
+    --color-separator: rgba(180, 162, 141, 0.3);
+    --border-color: #334155;
+    --shadow: none;
+    --success: #8AACAC;
+    --danger: #C76728;
+    --warning: #EB5F0A;
+    --info: #445563;
+    --drop-active: rgba(235, 95, 10, 0.15);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-primary);
 }
 
 body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
+    background-color: var(--bg-page);
+    color: var(--text-primary);
     height: 100vh;
     display: flex;
     overflow: hidden;
@@ -52,8 +70,8 @@ body {
 /* ── Sidebar ─────────────────────────────────────────────── */
 .sidebar {
     width: 260px;
-    background-color: var(--bg-panel);
-    border-right: 1px solid var(--border);
+    background-color: var(--bg-header);
+    border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     padding: 24px 0;
@@ -76,8 +94,12 @@ body {
     padding: 0;
 }
 
-.sidebar.collapsed .brand-logo {
+.sidebar.collapsed .brand-logo-wrap {
     width: 32px;
+    height: 32px;
+}
+
+.sidebar.collapsed .brand-logo-wrap img {
     height: 32px;
 }
 
@@ -104,21 +126,36 @@ body {
     gap: 12px;
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--color-accent);
     white-space: nowrap;
 }
 
-.brand-logo {
+/* ── Logo swap light/dark ────────────────────────────────── */
+.brand-logo-wrap {
     width: 40px;
     height: 40px;
-    object-fit: contain;
-    filter: brightness(0) invert(1);  /* Invierte a blanco para modo oscuro */
-    transition: width 0.3s ease, height 0.3s ease, filter 0.3s ease;
+    flex-shrink: 0;
+    transition: width 0.3s ease, height 0.3s ease;
 }
 
-body.light-mode .brand-logo {
-    filter: none;  /* Muestra logo oscuro original en modo claro */
+.brand-logo-wrap img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
 }
+
+/* Light: logo oscuro con mix-blend-mode */
+.logo-light {
+    display: block;
+    mix-blend-mode: multiply;
+}
+.logo-dark {
+    display: none;
+}
+
+/* Dark: swap al logo blanco */
+[data-theme="dark"] .logo-light { display: none; }
+[data-theme="dark"] .logo-dark  { display: block; }
 
 .brand-name {
     display: flex;
@@ -127,17 +164,17 @@ body.light-mode .brand-logo {
 }
 
 .brand-name strong {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 2px;
-    color: var(--text-main);
+    color: var(--text-primary);
 }
 
 .brand-subtitle {
     font-size: 0.65rem;
     font-weight: 400;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     letter-spacing: 0.5px;
     text-transform: none;
 }
@@ -145,14 +182,14 @@ body.light-mode .brand-logo {
 .btn-toggle {
     background: transparent;
     border: none;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-size: 1.2rem;
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .btn-toggle:hover {
-    color: var(--text-main);
+    color: var(--text-primary);
 }
 
 /* ── Navigation ──────────────────────────────────────────── */
@@ -169,21 +206,21 @@ body.light-mode .brand-logo {
     gap: 12px;
     padding: 12px 16px;
     border-radius: 8px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     text-decoration: none;
     font-weight: 500;
     transition: all 0.2s;
 }
 
 .nav-item:hover {
-    background-color: var(--bg-hover);
-    color: var(--text-main);
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
 }
 
 .nav-item.active {
-    background-color: rgba(68, 85, 99, 0.2);
-    color: var(--text-main);
-    border-left: 3px solid var(--accent);
+    background-color: rgba(68, 85, 99, 0.15);
+    color: var(--text-primary);
+    border-left: 3px solid var(--color-accent);
     padding-left: 13px;
 }
 
@@ -194,10 +231,11 @@ body.light-mode .brand-logo {
     flex-direction: column;
     padding: 40px;
     overflow-y: auto;
+    background: var(--bg-page);
 }
 
 .header-title h1 {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.6rem;
     font-weight: 700;
     margin-bottom: 8px;
@@ -206,7 +244,7 @@ body.light-mode .brand-logo {
 }
 
 .header-title p {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-size: 0.95rem;
 }
 
@@ -214,42 +252,48 @@ body.light-mode .brand-logo {
 .search-box {
     display: flex;
     align-items: center;
-    background-color: var(--bg-panel);
-    border: 1px solid var(--border);
+    background-color: var(--bg-header);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 0 16px;
     height: 48px;
     transition: border-color 0.2s;
     flex: 1;
+    box-shadow: var(--shadow);
 }
 
 .search-box:focus-within {
-    border-color: var(--accent);
+    border-color: var(--color-accent);
 }
 
 .search-box i {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     margin-right: 12px;
 }
 
 .search-box input {
     background: transparent;
     border: none;
-    color: var(--text-main);
+    color: var(--text-primary);
     font-size: 0.95rem;
     width: 100%;
     outline: none;
 }
 
+.search-box input::placeholder {
+    color: var(--text-secondary);
+}
+
 /* ── Table ───────────────────────────────────────────────── */
 .table-container {
-    background-color: var(--bg-panel);
+    background-color: var(--bg-header);
     border-radius: 12px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-color);
     overflow: hidden;
     flex: 1;
     display: flex;
     flex-direction: column;
+    box-shadow: var(--shadow);
 }
 
 table {
@@ -263,27 +307,27 @@ th {
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
     font-weight: 600;
 }
 
 td {
     padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
 }
 
 .cliente-name {
     font-weight: 600;
     font-size: 1rem;
-    color: var(--text-main);
+    color: var(--text-primary);
 }
 
 .asunto-preview {
     font-size: 0.9rem;
-    color: var(--text-muted);
-    background-color: rgba(0,0,0,0.15);
+    color: var(--text-secondary);
+    background-color: var(--bg-tertiary);
     padding: 6px 12px;
     border-radius: 6px;
     display: inline-block;
@@ -297,7 +341,7 @@ td {
 
 /* ── Buttons ─────────────────────────────────────────────── */
 .btn-generar {
-    background-color: #445563;  /* Pantone 7545 C — corporativo */
+    background-color: #445563;
     color: white;
     border: none;
     border-radius: 6px;
@@ -312,8 +356,9 @@ td {
 }
 
 .btn-generar:hover {
-    background-color: var(--accent);  /* Naranja solo como toque al interactuar */
+    background-color: var(--color-accent);
     transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(235, 95, 10, 0.3);
 }
 
 /* ── Drag & Drop ─────────────────────────────────────────── */
@@ -323,12 +368,12 @@ td {
 }
 
 .client-row:hover {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: var(--bg-tertiary);
 }
 
 .client-row.drag-over {
     background-color: var(--drop-active);
-    outline: 2px dashed var(--accent);
+    outline: 2px dashed var(--color-accent);
     outline-offset: -2px;
 }
 
@@ -343,7 +388,7 @@ td {
     align-items: center;
     justify-content: center;
     padding: 60px 0;
-    color: var(--text-muted);
+    color: var(--text-secondary);
 }
 
 .empty-state i {
@@ -368,7 +413,7 @@ td {
 
 /* ── Form container titles ───────────────────────────────── */
 .form-container h3 {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--font-heading);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -393,7 +438,7 @@ td {
   position: absolute;
   cursor: pointer;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-color: var(--border);
+  background-color: var(--border-color);
   transition: .4s;
 }
 
@@ -409,7 +454,7 @@ td {
 }
 
 input:checked + .slider {
-  background-color: var(--accent);
+  background-color: var(--color-accent);
 }
 
 input:checked + .slider:before {
@@ -435,9 +480,9 @@ input:checked + .slider:before {
 
 /* ── Refresh Button ──────────────────────────────────────── */
 .btn-refresh {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    color: var(--text-main);
+    background: var(--bg-header);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     width: 42px;
     height: 42px;
     border-radius: 10px;
@@ -448,6 +493,7 @@ input:checked + .slider:before {
     font-size: 1rem;
     transition: all 0.2s ease;
     flex-shrink: 0;
+    box-shadow: var(--shadow);
 }
 
 .btn-refresh:hover {
@@ -467,7 +513,7 @@ input:checked + .slider:before {
     border: none;
     cursor: pointer;
     font-size: 1.1rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     transition: all 0.2s;
     padding: 4px;
     opacity: 0.4;
@@ -479,7 +525,7 @@ input:checked + .slider:before {
 }
 
 .btn-fav.active {
-    color: #f59e0b;
+    color: var(--color-accent);  /* Naranja corporativo, NO amarillo */
     opacity: 1;
 }
 
@@ -500,14 +546,14 @@ input:checked + .slider:before {
     content: '';
     flex: 1;
     height: 1px;
-    background: var(--border);
+    background: var(--border-color);
 }
 
 .separator-line span {
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 2px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     opacity: 0.6;
 }
 
@@ -520,8 +566,8 @@ input:checked + .slider:before {
 }
 
 .stat-card {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
+    background: var(--bg-header);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;
     display: flex;
@@ -529,6 +575,7 @@ input:checked + .slider:before {
     align-items: center;
     gap: 8px;
     transition: transform 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
 }
 
 .stat-card:hover {
@@ -538,21 +585,21 @@ input:checked + .slider:before {
 
 .stat-icon {
     font-size: 1.5rem;
-    color: var(--accent);
+    color: var(--color-accent);
     margin-bottom: 4px;
 }
 
 .stat-number {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--font-heading);
     font-size: 2.4rem;
     font-weight: 700;
-    color: var(--text-main);
+    color: var(--text-primary);
     letter-spacing: 1px;
 }
 
 .stat-label {
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 500;
@@ -560,15 +607,16 @@ input:checked + .slider:before {
 
 /* ── Top Clients Card ────────────────────────────────────── */
 .top-clients-card {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
+    background: var(--bg-header);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;
     margin-top: 24px;
+    box-shadow: var(--shadow);
 }
 
 .top-clients-card h3 {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--font-heading);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -589,10 +637,10 @@ input:checked + .slider:before {
 }
 
 .top-client-rank {
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--font-heading);
     font-weight: 700;
     font-size: 1.2rem;
-    color: var(--accent);
+    color: var(--color-accent);
     min-width: 28px;
 }
 
@@ -608,21 +656,21 @@ input:checked + .slider:before {
 
 .top-client-bar-bg {
     height: 6px;
-    background: var(--border);
+    background: var(--border-color);
     border-radius: 3px;
     overflow: hidden;
 }
 
 .top-client-bar {
     height: 100%;
-    background: linear-gradient(90deg, #445563, var(--accent));
+    background: linear-gradient(90deg, #445563, var(--color-accent));
     border-radius: 3px;
     transition: width 0.6s ease;
 }
 
 .top-client-count {
     font-size: 0.9rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-weight: 600;
     min-width: 40px;
     text-align: right;
@@ -630,14 +678,14 @@ input:checked + .slider:before {
 
 /* ── Filtro Fecha (Select) ───────────────────────────────── */
 .filtro-fecha {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    color: var(--text-main);
+    background: var(--bg-header);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     padding: 0 16px;
     height: 48px;
     border-radius: 8px;
     font-size: 0.9rem;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-primary);
     cursor: pointer;
     outline: none;
     transition: border-color 0.2s;
@@ -645,7 +693,7 @@ input:checked + .slider:before {
 }
 
 .filtro-fecha:focus {
-    border-color: var(--accent);
+    border-color: var(--color-accent);
 }
 
 /* ── Historial Badges ────────────────────────────────────── */
@@ -663,12 +711,12 @@ input:checked + .slider:before {
 
 .badge-clasico {
     background: rgba(68, 85, 99, 0.2);
-    color: #8fa0b0;
+    color: var(--text-secondary);
 }
 
 .badge-nuevo {
     background: rgba(235, 95, 10, 0.12);
-    color: var(--accent);
+    color: var(--color-accent);
 }
 
 .badge-adjunto {
@@ -676,16 +724,16 @@ input:checked + .slider:before {
     align-items: center;
     gap: 4px;
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
 }
 
 .badge-adjunto i {
-    color: var(--accent);
+    color: var(--color-accent);
 }
 
 /* ── Skeleton Loader ─────────────────────────────────────── */
 .skeleton {
-    background: linear-gradient(90deg, var(--border) 25%, rgba(255,255,255,0.08) 50%, var(--border) 75%);
+    background: linear-gradient(90deg, var(--border-color) 25%, rgba(255,255,255,0.08) 50%, var(--border-color) 75%);
     background-size: 200% 100%;
     animation: skeleton-pulse 1.4s ease-in-out infinite;
 }
@@ -695,7 +743,7 @@ input:checked + .slider:before {
     100% { background-position: -200% 0; }
 }
 
-body.light-mode .skeleton {
+[data-theme="light"] .skeleton {
     background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
     background-size: 200% 100%;
     animation: skeleton-pulse 1.4s ease-in-out infinite;
@@ -712,8 +760,8 @@ body.light-mode .skeleton {
     top: 100%;
     left: 0;
     z-index: 100;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
+    background: var(--bg-header);
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 14px 18px;
     min-width: 320px;
@@ -730,12 +778,12 @@ body.light-mode .skeleton {
 
 .tooltip-row {
     margin-bottom: 6px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     word-break: break-all;
 }
 
 .tooltip-row strong {
-    color: var(--text-main);
+    color: var(--text-primary);
     margin-right: 4px;
 }
 

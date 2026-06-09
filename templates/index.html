@@ -1,17 +1,28 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agente de Correos | AquaShield</title>
-    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <link rel="manifest" href="/static/manifest.json">
     <meta name="theme-color" content="#445563">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css">
     <!-- FontAwesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // Inicializar tema ANTES del render para evitar flash
+        (function() {
+            const saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="app-container">
@@ -19,7 +30,10 @@
         <aside class="sidebar">
             <div class="logo">
                 <div class="logo-text">
-                    <img src="/static/logo_aquachile_dark.png" alt="AquaChile" class="brand-logo">
+                    <div class="brand-logo-wrap">
+                        <img class="logo-light" src="/static/logo_aquachile_dark.png" alt="AquaChile">
+                        <img class="logo-dark"  src="/static/logo_aquachile_white.png" alt="AquaChile">
+                    </div>
                     <div class="brand-name">
                         <strong>AQUASHIELD</strong>
                         <span class="brand-subtitle">by AquaChile</span>
@@ -112,7 +126,7 @@
                 <div class="top-clients-card">
                     <h3>Clientes Más Frecuentes</h3>
                     <div id="topClientes" class="top-clients-list">
-                        <p style="color: var(--text-muted);">Genera correos para ver estadísticas aquí.</p>
+                        <p style="color: var(--text-secondary);">Genera correos para ver estadísticas aquí.</p>
                     </div>
                 </div>
             </div>
@@ -173,20 +187,20 @@
                     </div>
                 </header>
                 
-                <div class="form-container" style="background: var(--bg-panel); padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-top: 24px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+                <div class="form-container" style="background: var(--bg-header); padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 24px; box-shadow: var(--shadow);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);">
                         <div>
                             <h3 style="margin-bottom: 4px;">Base de Clientes</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">Abre la planilla Excel para agregar, editar o eliminar clientes.</p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">Abre la planilla Excel para agregar, editar o eliminar clientes.</p>
                         </div>
                         <button class="btn-generar" id="btnAbrirExcel">
                             <i class="fa-solid fa-file-excel"></i> Abrir Excel
                         </button>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);">
                         <div>
                             <h3 style="margin-bottom: 4px;">Modo Claro (Light Mode)</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">Cambia el tema visual de oscuro a claro.</p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">Cambia el tema visual de oscuro a claro.</p>
                         </div>
                         <label class="theme-switch">
                             <input type="checkbox" id="lightModeToggle">
@@ -196,7 +210,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px;">
                         <div>
                             <h3 style="margin-bottom: 4px;">Outlook Nuevo</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">Activa si usas la nueva versión de Outlook. <br><span style="font-size: 0.8rem; color: var(--accent);">⚠ Outlook Nuevo: sin adjunto automático ni firma con formato.</span></p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">Activa si usas la nueva versión de Outlook. <br><span style="font-size: 0.8rem; color: var(--color-accent);">⚠ Outlook Nuevo: sin adjunto automático ni firma con formato.</span></p>
                         </div>
                         <label class="theme-switch">
                             <input type="checkbox" id="outlookModeToggle">
