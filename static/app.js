@@ -180,54 +180,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function appendClientRow(cliente, favs) {
-            const tr = document.createElement('tr');
-            tr.className = 'client-row';
-            tr.dataset.id = cliente.id;
+        const tr = document.createElement('tr');
+        tr.className = 'client-row';
+        tr.dataset.id = cliente.id;
 
-            const isFav = favs.includes(String(cliente.id));
-            const asuntoTpl = cliente.asunto || '';
-            const asuntoPreview = asuntoTpl.replace('[CLIENTE]', cliente.cliente).replace('[PEDIDO]', '...');
+        const isFav = favs.includes(String(cliente.id));
+        const asuntoTpl = cliente.asunto || '';
+        const asuntoPreview = asuntoTpl.replace('[CLIENTE]', cliente.cliente).replace('[PEDIDO]', '...');
 
-            const safeCliente = escapeHtml(cliente.cliente);
-            const safePara = escapeHtml(cliente.para) || '—';
-            const safeCc = escapeHtml(cliente.cc) || '—';
-            const safeCuerpo = (cliente.cuerpo || '').replace(/<br\s*\/?>/gi, ' ');
-            const safeCuerpoPreview = escapeHtml(safeCuerpo.substring(0, 100)) + (safeCuerpo.length > 100 ? '...' : '');
+        const safeCliente = escapeHtml(cliente.cliente);
+        const safePara = escapeHtml(cliente.para) || '—';
+        const safeCc = escapeHtml(cliente.cc) || '—';
+        const safeCuerpo = (cliente.cuerpo || '').replace(/<br\s*\/?>/gi, ' ');
+        const safeCuerpoPreview = escapeHtml(safeCuerpo.substring(0, 100)) + (safeCuerpo.length > 100 ? '...' : '');
 
-            tr.innerHTML = `
-                <td style="width: 40px; text-align: center;">
-                    <button class="btn-fav ${isFav ? 'active' : ''}" data-id="${cliente.id}" title="Marcar como favorito">
-                        <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
-                    </button>
-                </td>
-                <td class="td-cliente-name">
-                    <div class="cliente-name">${safeCliente}</div>
-                    <div class="cliente-tooltip">
-                        <div class="tooltip-row"><strong>Para:</strong> ${safePara}</div>
-                        <div class="tooltip-row"><strong>CC:</strong> ${safeCc}</div>
-                        <div class="tooltip-row"><strong>Cuerpo:</strong> ${safeCuerpoPreview}</div>
-                    </div>
-                </td>
-                <td>
-                    <div class="asunto-preview" title="${escapeHtml(asuntoPreview)}">${escapeHtml(asuntoPreview)}</div>
-                </td>
-                <td class="actions-col">
-                    <button class="btn-generar" onclick="generarCorreo(${cliente.id})" title="Generar Correo">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </button>
-                </td>
-            `;
+        tr.innerHTML = `
+            <td style="width: 40px; text-align: center;">
+                <button class="btn-fav ${isFav ? 'active' : ''}" data-id="${cliente.id}" title="Marcar como favorito">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
+                </button>
+            </td>
+            <td class="td-cliente-name">
+                <div class="cliente-name">${safeCliente}</div>
+                <div class="cliente-tooltip">
+                    <div class="tooltip-row"><strong>Para:</strong> ${safePara}</div>
+                    <div class="tooltip-row"><strong>CC:</strong> ${safeCc}</div>
+                    <div class="tooltip-row"><strong>Cuerpo:</strong> ${safeCuerpoPreview}</div>
+                </div>
+            </td>
+            <td>
+                <div class="asunto-preview" title="${escapeHtml(asuntoPreview)}">${escapeHtml(asuntoPreview)}</div>
+            </td>
+            <td class="actions-col">
+                <button class="btn-generar" onclick="generarCorreo(${cliente.id})" title="Generar Correo">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </td>
+        `;
 
-            // Evento favorito
-            tr.querySelector('.btn-fav').addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFavorito(cliente.id);
-            });
+        // Evento favorito
+        tr.querySelector('.btn-fav').addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFavorito(cliente.id);
+        });
 
-            // Drag & Drop
-            setupDragAndDrop(tr, cliente.id);
+        // Drag & Drop
+        setupDragAndDrop(tr, cliente.id);
 
-            clientesBody.appendChild(tr);
+        clientesBody.appendChild(tr);
     }
 
     // 3. Filtrar clientes
@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="top-client-item">
                     <span class="top-client-rank">#${i + 1}</span>
                     <div class="top-client-info">
-                        <div class="top-client-name">${c.nombre}</div>
+                        <div class="top-client-name">${escapeHtml(c.nombre)}</div>
                         <div class="top-client-bar-bg">
                             <div class="top-client-bar" style="width: ${(c.cantidad / maxCount * 100)}%"></div>
                         </div>
@@ -437,13 +437,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const modoClass = entry.modo === 'clasico' ? 'badge-clasico' : 'badge-nuevo';
             const modoLabel = entry.modo === 'clasico' ? 'Clásico' : 'Nuevo';
             const adjuntoHtml = entry.archivo 
-                ? `<span class="badge-adjunto"><i class="fa-solid fa-paperclip"></i> ${entry.archivo}</span>`
+                ? `<span class="badge-adjunto"><i class="fa-solid fa-paperclip"></i> ${escapeHtml(entry.archivo)}</span>`
                 : `<span style="color: var(--text-secondary); font-size: 0.85rem;">—</span>`;
 
             tr.innerHTML = `
                 <td style="font-size: 0.85rem; white-space: nowrap;">${fechaStr}</td>
-                <td><span class="cliente-name" style="font-size: 0.9rem;">${entry.cliente || ''}</span></td>
-                <td><span style="color: var(--text-secondary); font-size: 0.85rem;">${entry.asunto || ''}</span></td>
+                <td><span class="cliente-name" style="font-size: 0.9rem;">${escapeHtml(entry.cliente)}</span></td>
+                <td><span style="color: var(--text-secondary); font-size: 0.85rem;">${escapeHtml(entry.asunto)}</span></td>
                 <td>${adjuntoHtml}</td>
                 <td><span class="badge-modo ${modoClass}">${modoLabel}</span></td>
             `;

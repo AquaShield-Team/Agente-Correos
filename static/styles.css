@@ -234,6 +234,10 @@ body {
     background: var(--bg-page);
 }
 
+.top-header {
+    margin-bottom: 0;
+}
+
 .header-title h1 {
     font-family: var(--font-heading);
     font-size: 1.6rem;

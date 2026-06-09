@@ -29,7 +29,6 @@ UPLOAD_FOLDER = os.path.join(DIRECTORIO_ACTUAL, "uploads")
 app = Flask(__name__,
             template_folder=os.path.join(BUNDLE_DIR, 'templates'),
             static_folder=os.path.join(BUNDLE_DIR, 'static'))
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
